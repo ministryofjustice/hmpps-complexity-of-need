@@ -147,6 +147,9 @@ jobs:
       - run:
           name: Run Actual Tests
           command: bundle exec rake spec
+      - run:
+          name: Run Swagger
+          command: bundle exec rake rswag:specs:swaggerize
 
   build_and_push_docker_image:
     <<: *defaults

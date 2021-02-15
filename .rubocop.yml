@@ -11,7 +11,7 @@ require:
 AllCops:
   # Exclude anything that isn't really part of our code.
   # rails_helper is excluded because it's full of solecisms, but it's mostly
-  # generated code and copy-and-pasted snipets from READMEs.
+  # generated code and copy-and-pasted snippets from READMEs.
   Exclude:
     - 'vendor/**/*'
     - 'db/schema.rb'
@@ -27,3 +27,6 @@ RSpec/MultipleExpectations:
 
 Style/FrozenStringLiteralComment:
   Enabled: true
+
+RSpec/ExampleLength:
+  Max: 10
