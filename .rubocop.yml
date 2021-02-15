@@ -1,0 +1,29 @@
+inherit_gem:
+  rubocop-govuk:
+    - config/default.yml
+    - config/rails.yml
+
+require:
+  - rubocop-rspec
+  - rubocop-performance
+  - rubocop-rails
+
+AllCops:
+  # Exclude anything that isn't really part of our code.
+  # rails_helper is excluded because it's full of solecisms, but it's mostly
+  # generated code and copy-and-pasted snipets from READMEs.
+  Exclude:
+    - 'vendor/**/*'
+    - 'db/schema.rb'
+    - 'spec/rails_helper.rb'
+    - 'bin/*'
+    - 'config/environments/*.rb'
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 2
+
+Style/FrozenStringLiteralComment:
+  Enabled: true

@@ -1,0 +1,205 @@
+references:
+  defaults: &defaults
+    working_directory: ~/repo
+
+  github_team_name_slug: &github_team_name_slug
+    GITHUB_TEAM_NAME_SLUG: offender-management
+
+  deploy_container_config: &deploy_container_config
+    resource_class: small
+    docker:
+      - image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/cloud-platform/tools:circleci
+        environment:
+          KUBE_ENV_STAGING_NAMESPACE: complexity-of-need-staging
+          KUBE_ENV_STAGING_NAME: live-1.cloud-platform.service.justice.gov.uk
+
+  test_container_config: &test_container_config
+    resource_class: small
+    docker:
+      - image: circleci/ruby:2.6.5-node-browsers
+        environment:
+          ECR_ENDPOINT: 754256621582.dkr.ecr.eu-west-2.amazonaws.com
+          RAILS_ENV: test
+          PGHOST: 127.0.0.1
+          PGUSER: ubuntu
+          RACK_ENV: test
+          AWS_DEFAULT_REGION: eu-west-2
+      - image: circleci/postgres:10.5-alpine
+        environment:
+          POSTGRES_USER: ubuntu
+          POSTGRES_PASSWORD: ""
+          POSTGRES_DB: hmpps_complexity_of_need_test
+
+  install_gpg: &install_gpg
+    run:
+      name: Install GPG
+      command: |
+        apk add \
+          --no-cache \
+          --no-progress \
+          gnupg
+
+  configure_gpg: &configure_gpg
+    run:
+      name: Configure GPG
+      command: |
+        echo "${GPG_PRIVATE_KEY}" | base64 -d | gpg --batch --allow-secret-key-import --import
+
+  decrypt_secrets: &decrypt_secrets
+    run:
+      name: Decrypt secrets file
+      command: |
+        gpg --export-ownertrust > /tmp/ownertrust.txt
+        echo $GPG_KEY_ID:1 >> /tmp/ownertrust.txt
+        gpg --import-ownertrust /tmp/ownertrust.txt
+        gpgconf --kill gpg-agent
+        gpg-agent --daemon --allow-preset-passphrase
+        /usr/libexec/gpg-preset-passphrase --preset --passphrase $GPG_PASSPHRASE $GPG_KEY_KEYGRIP_ID
+        git-crypt unlock
+
+    install_aws_cli: &install_aws_cli
+      run:
+        name: Set up aws
+        command: |
+          sudo apt-get update
+          sudo apt-get --assume-yes install python3-pip
+          sudo pip3 install awscli
+
+    build_docker_image: &build_docker_image
+      run:
+        name: Build docker image
+        command: |
+          export BUILD_DATE=$(date -Is) >> $BASH_ENV
+          source $BASH_ENV
+          docker build \
+            --build-arg VERSION_NUMBER=${CIRCLE_BUILD_NUM} \
+            --build-arg COMMIT_ID=${CIRCLE_SHA1} \
+            --build-arg BUILD_DATE=${BUILD_DATE} \
+            --build-arg BUILD_TAG=${CIRCLE_BRANCH} \
+            -t app .
+
+    push_docker_image: &push_docker_image
+      run:
+        name: Push docker image
+        command: |
+          login="$(aws ecr get-login --region eu-west-2 --no-include-email)"
+          ${login}
+          docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
+          docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}"
+          if [ "${CIRCLE_BRANCH}" == "main" ]; then
+            docker tag app "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
+            docker push "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:latest"
+          fi
+        environment:
+          <<: *github_team_name_slug
+          REPONAME: hmpps-complexity-of-need
+
+version: 2.1
+jobs:
+  install_dependencies:
+    <<: *defaults
+    <<: *test_container_config
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - hmpps-complexity-of-need-{{ checksum "Gemfile.lock" }}
+            - hmpps-complexity-of-need-
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
+      - save_cache:
+          key: hmpps-complexity-of-need-{{ checksum "Gemfile.lock" }}
+          paths:
+            - ~/repo/vendor/bundle
+
+  rubocop:
+    <<: *defaults
+    <<: *test_container_config
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - hmpps-complexity-of-need-{{ checksum "Gemfile.lock" }}
+            - hmpps-complexity-of-need-
+      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
+      - run:
+          name: Rubocop
+          command: bundle exec rubocop
+
+  run_tests:
+    <<: *defaults
+    <<: *test_container_config
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - hmpps-complexity-of-need-{{ checksum "Gemfile.lock" }}
+            - hmpps-complexity-of-need-
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
+      - run:
+          name: Security analysis
+          command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
+      - run:
+          name: Run Actual Tests
+          command: bundle exec rake spec
+
+  build_and_push_docker_image:
+    <<: *defaults
+    <<: *test_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - *install_aws_cli
+      - *build_docker_image
+      - *push_docker_image
+
+  deploy_code:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - run:
+          name: Kubectl deployment staging setup
+          command: |
+            setup-kube-auth
+            kubectl config use-context staging
+      #      - *install_gpg
+      #      - *configure_gpg
+      - deploy:
+          name: Deploy to K8s
+          command: |
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/deployment.yaml
+            kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy
+          environment:
+            <<: *github_team_name_slug
+
+workflows:
+  build_and_test:
+    jobs:
+      - install_dependencies
+      - rubocop:
+          requires:
+            - install_dependencies
+      - run_tests:
+          requires:
+            - rubocop
+      - build_and_push_docker_image:
+          requires:
+            - run_tests
+          filters:
+            branches:
+              only: main
+      - deploy_code:
+          requires:
+            - build_and_push_docker_image
+          filters:
+            branches:
+              only: main
