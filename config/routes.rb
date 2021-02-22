@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   defaults format: :json do
     # Prefix endpoints with /v1
     scope path: "/v1" do
-      get "/complexity-of-need/offender-no/:offender_no" => "complexities#show"
+      get "/complexity-of-need/offender-no/:offender_no" => "complexities#show", as: :complexity_of_need_single
       post "/complexity-of-need/offender-no/:offender_no" => "complexities#create"
       post "/complexity-of-need/multiple/offender-no" => "complexities#multiple"
       get "/complexity-of-need/offender-no/:offender_no/history" => "complexities#history"

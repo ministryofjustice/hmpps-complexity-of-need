@@ -5,4 +5,5 @@ metadata:
 data:
   RAILS_ENV: "production"
   SENTRY_CURRENT_ENV: "staging"
+  COMPLEXITY_OF_NEED_HOST: "https://hmpps-complexity-of-need-staging.apps.live-1.cloud-platform.service.justice.gov.uk"
   NOMIS_OAUTH_HOST: "https://sign-in-dev.hmpps.service.justice.gov.uk"

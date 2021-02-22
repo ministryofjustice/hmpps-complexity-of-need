@@ -33,6 +33,8 @@ rescue ActiveRecord::PendingMigrationError => e
   exit 1
 end
 RSpec.configure do |config|
+  config.example_status_persistence_file_path = 'tmp/example_status.txt'
+
   config.include FactoryBot::Syntax::Methods
   config.include AuthHelper
 

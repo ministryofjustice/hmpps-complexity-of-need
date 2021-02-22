@@ -3,6 +3,45 @@
 require "rails_helper"
 
 RSpec.describe Complexity, type: :model do
+  let(:complexity) { build(:complexity) }
+  let(:event_type) {
+    {
+    string_value: "complexity-of-need.level.changed",
+    data_type: "String",
+  }
+  }
+  let(:message) {
+    {
+      offenderNo: complexity.offender_no,
+      level: complexity.level,
+    }.to_json
+  }
+  let(:version) {
+    {
+      string_value: "1",
+      data_type: "Number",
+    }
+  }
+  let(:url) {
+    {
+      string_value: Rails.application.routes.url_helpers.complexity_of_need_single_url(complexity.offender_no),
+      data_type: "String",
+    }
+  }
+  let(:topic) { instance_double("topic", publish: nil) }
+
+  before do
+    allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
+  end
+
+  it "sends a complexity SNS message after save" do
+    complexity.save!
+    expect(topic).to have_received(:publish).with(
+      message: message,
+      message_attributes: hash_including(eventType: event_type, version: version, detailURL: url),
+      )
+  end
+
   describe "VALID_LEVELS" do
     it "is array: low, medium and high" do
       expect(described_class::VALID_LEVELS).to eq(%w[low medium high])

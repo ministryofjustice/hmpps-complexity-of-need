@@ -209,6 +209,7 @@ workflows:
             branches:
               only:
                 - main
+                - mo484-sns-sqs-spike
       - deploy_staging:
           requires:
             - build_and_push_docker_image
@@ -216,3 +217,4 @@ workflows:
             branches:
               only:
                 - main
+                - mo484-sns-sqs-spike

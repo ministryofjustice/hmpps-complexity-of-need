@@ -21,11 +21,8 @@ gem "rails", "~> 6.1.2", ">= 6.1.2.1"
 gem "responders"
 gem "rswag-api"
 gem "rswag-ui"
-# Use Active Model has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
 
-# Use Active Storage variant
-# gem 'image_processing', '~> 1.2'
+gem "aws-sdk-sns"
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'

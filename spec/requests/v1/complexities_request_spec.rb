@@ -8,6 +8,11 @@ RSpec.describe "Complexities", type: :request do
     # Include an Authorization header to make the request valid
     { "Authorization" => auth_header }
   }
+  let(:topic) { instance_double("topic", publish: nil) }
+
+  before do
+    allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
+  end
 
   describe "GET /v1/complexity-of-need/offender-no/:offender_no" do
     let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}" }
