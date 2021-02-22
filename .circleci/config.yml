@@ -4,13 +4,15 @@ references:
 
   github_team_name_slug: &github_team_name_slug
     GITHUB_TEAM_NAME_SLUG: offender-management
+    ECR_ENDPOINT: 754256621582.dkr.ecr.eu-west-2.amazonaws.com
+    REPONAME: hmpps-complexity-of-need
 
   deploy_container_config: &deploy_container_config
     resource_class: small
     docker:
       - image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/cloud-platform/tools:circleci
         environment:
-          KUBE_ENV_STAGING_NAMESPACE: complexity-of-need-staging
+          KUBE_ENV_STAGING_NAMESPACE: hmpps-complexity-of-need-staging
           KUBE_ENV_STAGING_NAME: live-1.cloud-platform.service.justice.gov.uk
 
   test_container_config: &test_container_config
@@ -18,7 +20,6 @@ references:
     docker:
       - image: circleci/ruby:2.6.5-node-browsers
         environment:
-          ECR_ENDPOINT: 754256621582.dkr.ecr.eu-west-2.amazonaws.com
           RAILS_ENV: test
           PGHOST: 127.0.0.1
           PGUSER: ubuntu
@@ -92,7 +93,6 @@ references:
           fi
         environment:
           <<: *github_team_name_slug
-          REPONAME: hmpps-complexity-of-need
 
 version: 2.1
 jobs:
@@ -164,7 +164,7 @@ jobs:
       - *build_docker_image
       - *push_docker_image
 
-  deploy_code:
+  deploy_staging:
     <<: *deploy_container_config
     steps:
       - checkout
@@ -176,11 +176,13 @@ jobs:
       #      - *install_gpg
       #      - *configure_gpg
       - deploy:
-          name: Deploy to K8s
+          name: Deploy to Staging K8s
           command: |
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/deployment.yaml
+            kubectl delete job hmpps-complexity-of-need-migration --ignore-not-found
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/migration-job.yaml
             kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-            kubectl apply --record=false -f ./deploy
+            kubectl apply --record=false -f ./deploy/staging
           environment:
             <<: *github_team_name_slug
 
@@ -199,10 +201,14 @@ workflows:
             - run_tests
           filters:
             branches:
-              only: main
-      - deploy_code:
+              only:
+                - main
+                - mo418-add-hosting-infrastructure
+      - deploy_staging:
           requires:
             - build_and_push_docker_image
           filters:
             branches:
-              only: main
+              only:
+                - main
+                - mo418-add-hosting-infrastructure

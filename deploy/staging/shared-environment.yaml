@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-environment
+data:
+  RAILS_ENV: "production"
+  RAILS_WEB_CONCURRENCY: "5"
+  SENTRY_CURRENT_ENV: "staging"
+
