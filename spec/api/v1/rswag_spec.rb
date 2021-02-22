@@ -9,6 +9,13 @@ require "swagger_helper"
 # rubocop:disable RSpec/EmptyExampleGroup
 # Authorization 'method' needs to be defined for rswag
 describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
+  let(:topic) { instance_double("topic", publish: nil) }
+
+  before do
+    allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
+    create(:complexity, :with_user, offender_no: "G4273GI")
+  end
+
   path "/complexity-of-need/offender-no/{offender_no}" do
     parameter name: :offender_no, in: :path, type: :string,
               description: "NOMIS Offender Number", example: "A0000AA"
@@ -17,10 +24,6 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
       tags "Single Offender"
 
       response "200", "Offender's current Complexity of Need level found" do
-        before do
-          create(:complexity, :with_user, offender_no: offender_no)
-        end
-
         schema "$ref" => "#/components/schemas/ComplexityOfNeed"
 
         let(:offender_no) { "G4273GI" }

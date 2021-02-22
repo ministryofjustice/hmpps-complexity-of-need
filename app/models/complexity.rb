@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Complexity < ApplicationRecord
+  after_save do |complexity|
+    ComplexityEventService.send_complexity(complexity)
+  end
   VALID_LEVELS = %w[low medium high].freeze
 
   validates :offender_no, presence: true

@@ -4,6 +4,11 @@ require "rails_helper"
 
 RSpec.describe "Complexities", type: :request do
   let(:response_json) { JSON.parse(response.body) }
+  let(:topic) { instance_double("topic", publish: nil) }
+
+  before do
+    allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
+  end
 
   describe "GET /v1/complexity-of-need/offender-no/:offender_no" do
     let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}" }
@@ -266,6 +271,14 @@ RSpec.describe "Complexities", type: :request do
 
       it "returns all records without paginating" do
         expect(response_json).to match_array json_object(expected_response)
+      end
+    end
+
+    context "when not found" do
+      it "returns 404" do
+        get "/v1/complexity-of-need/offender-no/27.json"
+
+        expect(response).to have_http_status :not_found
       end
     end
   end
