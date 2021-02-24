@@ -42,20 +42,6 @@ RUN \
   && timedatectl set-timezone Europe/London || true \
   && gem update bundler --no-document
 
-RUN \
-  set -ex \
-  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-
-RUN \
-  set -ex \
-  && apt-get update \
-  && apt-get install \
-    -y \
-    --no-install-recommends \
-    yarn=1.10.1-1 \
-  && yarn install
-
 COPY Gemfile Gemfile.lock package.json ./
 
 RUN bundle install --without development test --jobs 2 --retry 3
