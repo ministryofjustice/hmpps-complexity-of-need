@@ -19,27 +19,7 @@ describe "Complexity API" do
           create(:complexity, :with_user, offender_no: offender_no)
         end
 
-        schema type: :object,
-               properties: {
-                   sourceUser: {
-                       type: :integer,
-                       description: "The NOMIS user id who supplied this value via manual entry",
-                   },
-                   offenderNo: {
-                       type: :string,
-                       description: "NOMIS Offender Number",
-                   },
-                   level: { "$ref" => "#/components/schemas/level" },
-                   createdTimeStamp: {
-                       type: :string,
-                       format: :date_time,
-                       description: "The date & time this entry was created",
-                   },
-                   sourceSystem: { type: :string,
-                                   description: "The client id of the system that created this entry" },
-               },
-               required: %w[offenderNo level createdTimeStamp sourceSystem],
-               additionalProperties: false
+        schema "$ref" => "#/components/schemas/ComplexityOfNeed"
 
         let(:offender_no) { "G4273GI" }
 

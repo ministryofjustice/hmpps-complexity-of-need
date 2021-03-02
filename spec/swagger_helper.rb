@@ -22,13 +22,47 @@ RSpec.configure do |config|
         version: "v1",
       },
       components: {
-          schemas: {
-              level: {
-                  type: :string,
-                  enum: %w[low medium high],
-                  description: "Complexity of Need Level",
-              },
+        schemas: {
+          Level: {
+            type: :string,
+            enum: %w[low medium high],
+            description: "Complexity of Need Level",
+            example: "medium",
           },
+          ComplexityOfNeed: {
+            type: :object,
+            properties: {
+              offenderNo: {
+                type: :string,
+                description: "NOMIS Offender Number",
+                example: "A0000AA",
+              },
+              level: { "$ref" => "#/components/schemas/Level" },
+              sourceUser: {
+                type: :string,
+                description: "The NOMIS user id who supplied this value via manual entry",
+                example: "JSMITH_GEN",
+              },
+              sourceSystem: {
+                type: :string,
+                description: "The client id of the system that created this entry",
+                example: "hmpps-api-client-id",
+              },
+              notes: {
+                type: :string,
+                description: "Free-text notes for this entry",
+              },
+              createdTimeStamp: {
+                type: :string,
+                format: :date_time,
+                description: "The date & time this entry was created",
+                example: "2021-03-02T12:20:47+00:00",
+              },
+            },
+            required: %w[offenderNo level createdTimeStamp sourceSystem],
+            additionalProperties: false,
+          },
+        },
       },
       paths: {},
       servers: [
