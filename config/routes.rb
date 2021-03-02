@@ -8,5 +8,7 @@ Rails.application.routes.draw do
   #resources :complexities, only: :show do
   #
   #end
-  get "/complexity-of-need/offender-no/:offender_no" => "complexities#show"
+  defaults format: :json do
+    get "/complexity-of-need/offender-no/:offender_no" => "complexities#show"
+  end
 end

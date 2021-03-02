@@ -9,7 +9,7 @@ RSpec.describe "Complexities", type: :request do
     }
 
     it "returns complexity" do
-      get "/complexity-of-need/offender-no/#{complexity.offender_no}.json"
+      get "/complexity-of-need/offender-no/#{complexity.offender_no}"
 
       expect(response).to have_http_status :ok
       expect(JSON.parse(response.body))
@@ -24,7 +24,7 @@ RSpec.describe "Complexities", type: :request do
 
   context "when not found" do
     it "returns 404" do
-      get "/complexity-of-need/offender-no/27.json"
+      get "/complexity-of-need/offender-no/27"
 
       expect(response).to have_http_status :not_found
     end
@@ -36,7 +36,7 @@ RSpec.describe "Complexities", type: :request do
     }
 
     it "returns complexity" do
-      get "/complexity-of-need/offender-no/#{complexity.offender_no}.json"
+      get "/complexity-of-need/offender-no/#{complexity.offender_no}"
 
       expect(response).to have_http_status :ok
       expect(JSON.parse(response.body))
