@@ -20,3 +20,7 @@
 /.idea
 *.iml
 .ruby-gemset
+
+# Ignore generated swagger definition
+# This is created dynamically by running: rake rswag
+/swagger
