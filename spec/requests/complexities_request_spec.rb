@@ -14,11 +14,11 @@ RSpec.describe "Complexities", type: :request do
       expect(response).to have_http_status :ok
       expect(JSON.parse(response.body))
           .to eq({
-                     offenderNo: complexity.offender_no,
-                                                  level: complexity.level,
-                                                  sourceSystem: complexity.source_system,
-                                                  createdTimeStamp: JSON.parse(complexity.created_at.to_json),
-                                              }.stringify_keys)
+                   offenderNo: complexity.offender_no,
+                   level: complexity.level,
+                   sourceSystem: complexity.source_system,
+                   createdTimeStamp: JSON.parse(complexity.created_at.to_json),
+                 }.stringify_keys)
     end
   end
 
@@ -30,7 +30,7 @@ RSpec.describe "Complexities", type: :request do
     end
   end
 
-  context "with a user id" do
+  context "with a source user" do
     let!(:complexity) {
       create(:complexity, :with_user)
     }
@@ -41,12 +41,12 @@ RSpec.describe "Complexities", type: :request do
       expect(response).to have_http_status :ok
       expect(JSON.parse(response.body))
           .to eq({
-                     sourceUser: complexity.user_id,
-                     offenderNo: complexity.offender_no,
-                                                  level: complexity.level,
-                                                  sourceSystem: complexity.source_system,
-                                                  createdTimeStamp: JSON.parse(complexity.created_at.to_json),
-                                              }.stringify_keys)
+                   sourceUser: complexity.source_user,
+                   offenderNo: complexity.offender_no,
+                   level: complexity.level,
+                   sourceSystem: complexity.source_system,
+                   createdTimeStamp: JSON.parse(complexity.created_at.to_json),
+                 }.stringify_keys)
     end
   end
 end

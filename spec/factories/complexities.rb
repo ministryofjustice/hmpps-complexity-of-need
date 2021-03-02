@@ -7,7 +7,7 @@ FactoryBot.define do
     source_system { "omic-mpc-something" }
 
     trait :with_user do
-      user_id { 456_786 }
+      source_user { "A_NOMIS_USER" }
     end
   end
 end
