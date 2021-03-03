@@ -25,6 +25,7 @@ references:
           PGUSER: ubuntu
           RACK_ENV: test
           AWS_DEFAULT_REGION: eu-west-2
+          NOMIS_OAUTH_HOST: https://sign-in-dev.hmpps.service.justice.gov.uk
       - image: circleci/postgres:10.5-alpine
         environment:
           POSTGRES_USER: ubuntu

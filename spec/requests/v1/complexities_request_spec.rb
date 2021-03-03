@@ -4,13 +4,17 @@ require "rails_helper"
 
 RSpec.describe "Complexities", type: :request do
   let(:response_json) { JSON.parse(response.body) }
+  let(:request_headers) {
+    # Include an Authorization header to make the request valid
+    { "Authorization" => auth_header }
+  }
 
   describe "GET /v1/complexity-of-need/offender-no/:offender_no" do
     let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}" }
     let(:offender_no) { complexity.offender_no }
 
     before do
-      get endpoint
+      get endpoint, headers: request_headers
     end
 
     context "when default" do
@@ -69,7 +73,7 @@ RSpec.describe "Complexities", type: :request do
           create(:complexity, offender_no: different_offender_no, created_at: date, updated_at: date)
         end
 
-        get endpoint
+        get endpoint, headers: request_headers
       end
 
       it "returns the most recent one for the specified offender" do
@@ -89,7 +93,7 @@ RSpec.describe "Complexities", type: :request do
     let(:offender_no) { "ABC123" }
 
     before do
-      post endpoint, params: post_body, as: :json
+      post endpoint, params: post_body, as: :json, headers: request_headers
     end
 
     context "with only mandatory fields" do
@@ -176,7 +180,7 @@ RSpec.describe "Complexities", type: :request do
 
     context "with a missing or invalid request body" do
       before do
-        post endpoint
+        post endpoint, headers: request_headers
       end
 
       it "returns HTTP 400 Bad Request" do
@@ -191,7 +195,7 @@ RSpec.describe "Complexities", type: :request do
 
     context "with an empty array" do
       before do
-        post endpoint, params: [], as: :json
+        post endpoint, params: [], as: :json, headers: request_headers
       end
 
       it "returns an empty result set" do
@@ -225,7 +229,7 @@ RSpec.describe "Complexities", type: :request do
         create_list(:complexity, 10, :random_date, offender_no: offender_with_multiple_levels)
         create(:complexity, :random_date, :with_user, :with_notes, offender_no: offender_with_one_level)
 
-        post endpoint, params: post_body, as: :json
+        post endpoint, params: post_body, as: :json, headers: request_headers
       end
 
       it "returns an array of the current Complexity level for each offender" do
@@ -261,7 +265,7 @@ RSpec.describe "Complexities", type: :request do
           create(:complexity, :random_date, offender_no: offender)
         }
 
-        post endpoint, params: offenders, as: :json
+        post endpoint, params: offenders, as: :json, headers: request_headers
       end
 
       it "returns all records without paginating" do
