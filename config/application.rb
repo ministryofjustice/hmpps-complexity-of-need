@@ -38,5 +38,12 @@ module HmppsComplexityOfNeed
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # Always required
+    config.nomis_oauth_host = ENV.fetch("NOMIS_OAUTH_HOST")&.strip
+
+    # Only required for tests
+    config.nomis_oauth_client_id = ENV["NOMIS_OAUTH_CLIENT_ID"]&.strip
+    config.nomis_oauth_client_secret = ENV["NOMIS_OAUTH_CLIENT_SECRET"]&.strip
   end
 end

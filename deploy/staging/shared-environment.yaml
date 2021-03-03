@@ -5,4 +5,4 @@ metadata:
 data:
   RAILS_ENV: "production"
   SENTRY_CURRENT_ENV: "staging"
-
+  NOMIS_OAUTH_HOST: "https://sign-in-dev.hmpps.service.justice.gov.uk"
