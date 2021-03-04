@@ -9,5 +9,9 @@ FactoryBot.define do
     trait :with_user do
       source_user { "A_NOMIS_USER" }
     end
+
+    trait :with_notes do
+      notes { "Some reason why this level was given" }
+    end
   end
 end

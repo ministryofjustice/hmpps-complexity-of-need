@@ -29,4 +29,4 @@ Style/FrozenStringLiteralComment:
   Enabled: true
 
 RSpec/ExampleLength:
-  Max: 10
+  Max: 11

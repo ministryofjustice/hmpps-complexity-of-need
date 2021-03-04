@@ -25,9 +25,9 @@ RSpec.configure do |config|
         schemas: {
           Level: {
             type: :string,
-            enum: %w[low medium high],
+            enum: Complexity::VALID_LEVELS,
             description: "Complexity of Need Level",
-            example: "medium",
+            example: Complexity::VALID_LEVELS.first,
           },
           ComplexityOfNeed: {
             type: :object,
@@ -40,12 +40,12 @@ RSpec.configure do |config|
               level: { "$ref" => "#/components/schemas/Level" },
               sourceUser: {
                 type: :string,
-                description: "The NOMIS user id who supplied this value via manual entry",
+                description: "The NOMIS username that supplied this Complexity of Need entry",
                 example: "JSMITH_GEN",
               },
               sourceSystem: {
                 type: :string,
-                description: "The client id of the system that created this entry",
+                description: "The OAuth Client ID of the system that created this entry",
                 example: "hmpps-api-client-id",
               },
               notes: {
@@ -55,11 +55,28 @@ RSpec.configure do |config|
               createdTimeStamp: {
                 type: :string,
                 format: :date_time,
-                description: "The date & time this entry was created",
-                example: "2021-03-02T12:20:47+00:00",
+                description: "The date & time this entry was created (in RFC 3339 format)",
+                example: "2021-03-02T17:18:46.457Z",
               },
             },
             required: %w[offenderNo level createdTimeStamp sourceSystem],
+            additionalProperties: false,
+          },
+          NewComplexityOfNeed: {
+            type: :object,
+            properties: {
+              level: { "$ref" => "#/components/schemas/Level" },
+              sourceUser: {
+                type: :string,
+                description: "The NOMIS username that supplied this Complexity of Need entry",
+                example: "JSMITH_GEN",
+              },
+              notes: {
+                type: :string,
+                description: "Free-text notes for this entry",
+              },
+            },
+            required: %w[level],
             additionalProperties: false,
           },
         },
