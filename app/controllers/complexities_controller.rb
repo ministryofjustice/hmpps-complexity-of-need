@@ -6,7 +6,7 @@ class ComplexitiesController < ApplicationController
   rescue_from ActiveRecord::RecordInvalid, with: :validation_error
 
   def show
-    @complexity = Complexity.find_by!(offender_no: params[:offender_no])
+    @complexity = Complexity.order(created_at: :desc).find_by!(offender_no: params[:offender_no])
   end
 
   def create

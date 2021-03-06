@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :complexity do
     offender_no { "1234567" }
-    level { "high" }
+    level { Complexity::VALID_LEVELS.sample }
     source_system { "omic-mpc-something" }
 
     trait :with_user do

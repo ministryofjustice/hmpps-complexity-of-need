@@ -60,6 +60,33 @@ RSpec.describe "Complexities", type: :request do
                             }.to_json))
       end
     end
+
+    context "with multiple complexity levels in the database" do
+      let(:offender_no) { "ABC123" }
+      let(:different_offender_no) { "XYZ456" }
+
+      before do
+        # Populate database with multiple records for multiple offenders
+        [1.month.ago, 1.week.ago, 1.day.ago].each do |date|
+          create(:complexity, offender_no: offender_no, created_at: date, updated_at: date)
+          create(:complexity, offender_no: different_offender_no, created_at: date, updated_at: date)
+        end
+
+        get "/complexity-of-need/offender-no/#{offender_no}"
+      end
+
+      it "returns the most recent one for the specified offender" do
+        most_recent = Complexity.where(offender_no: offender_no).order(created_at: :desc).first
+
+        expect(JSON.parse(response.body))
+            .to eq(JSON.parse({
+                                  level: most_recent.level,
+                                  offenderNo: offender_no,
+                                  createdTimeStamp: most_recent.created_at,
+                                  sourceSystem: most_recent.source_system,
+                              }.to_json))
+      end
+    end
   end
 
   describe "POST /complexity-of-need/offender-no/:offender_no" do
