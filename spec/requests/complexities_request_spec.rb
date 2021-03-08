@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Complexities", type: :request do
+  let(:response_json) { JSON.parse(response.body) }
+
   describe "GET /complexity-of-need/offender-no/:offender_no" do
     let(:offender_no) { complexity.offender_no }
 
@@ -17,13 +19,11 @@ RSpec.describe "Complexities", type: :request do
 
       it "returns complexity" do
         expect(response).to have_http_status :ok
-        expect(JSON.parse(response.body))
-          .to eq(JSON.parse({
-                   offenderNo: complexity.offender_no,
-                   level: complexity.level,
-                   sourceSystem: complexity.source_system,
-                   createdTimeStamp: JSON.parse(complexity.created_at.to_json),
-                 }.to_json))
+        expect(response_json)
+          .to eq json_object(offenderNo: complexity.offender_no,
+                             level: complexity.level,
+                             sourceSystem: complexity.source_system,
+                             createdTimeStamp: complexity.created_at)
       end
     end
 
@@ -34,15 +34,13 @@ RSpec.describe "Complexities", type: :request do
 
       it "returns complexity" do
         expect(response).to have_http_status :ok
-        expect(JSON.parse(response.body))
-          .to eq(JSON.parse({
-                   sourceUser: complexity.source_user,
-                   notes: complexity.notes,
-                   offenderNo: complexity.offender_no,
-                   level: complexity.level,
-                   sourceSystem: complexity.source_system,
-                   createdTimeStamp: JSON.parse(complexity.created_at.to_json),
-                 }.to_json))
+        expect(response_json)
+          .to eq json_object(sourceUser: complexity.source_user,
+                             notes: complexity.notes,
+                             offenderNo: complexity.offender_no,
+                             level: complexity.level,
+                             sourceSystem: complexity.source_system,
+                             createdTimeStamp: complexity.created_at)
       end
     end
 
@@ -54,10 +52,8 @@ RSpec.describe "Complexities", type: :request do
       end
 
       it "includes an error message" do
-        expect(JSON.parse(response.body))
-          .to eq(JSON.parse({
-                              message: "No record found for that offender",
-                            }.to_json))
+        expect(response_json)
+          .to eq json_object(message: "No record found for that offender")
       end
     end
 
@@ -78,13 +74,11 @@ RSpec.describe "Complexities", type: :request do
       it "returns the most recent one for the specified offender" do
         most_recent = Complexity.where(offender_no: offender_no).order(created_at: :desc).first
 
-        expect(JSON.parse(response.body))
-            .to eq(JSON.parse({
-                                  level: most_recent.level,
-                                  offenderNo: offender_no,
-                                  createdTimeStamp: most_recent.created_at,
-                                  sourceSystem: most_recent.source_system,
-                              }.to_json))
+        expect(response_json)
+            .to eq json_object(level: most_recent.level,
+                               offenderNo: offender_no,
+                               createdTimeStamp: most_recent.created_at,
+                               sourceSystem: most_recent.source_system)
       end
     end
   end
@@ -106,13 +100,11 @@ RSpec.describe "Complexities", type: :request do
       it "creates a new record" do
         expect(response).to have_http_status :ok
         complexity = Complexity.find_by!(offender_no: offender_no)
-        expect(JSON.parse(response.body))
-          .to eq(JSON.parse({
-                   offenderNo: offender_no,
-                   level: post_body.fetch(:level),
-                   sourceSystem: "hardcoded-oauth-client-id",
-                   createdTimeStamp: complexity.created_at,
-                 }.to_json))
+        expect(response_json)
+          .to eq json_object(offenderNo: offender_no,
+                             level: post_body.fetch(:level),
+                             sourceSystem: "hardcoded-oauth-client-id",
+                             createdTimeStamp: complexity.created_at)
       end
     end
 
@@ -128,15 +120,13 @@ RSpec.describe "Complexities", type: :request do
       it "creates a new record" do
         expect(response).to have_http_status :ok
         complexity = Complexity.find_by!(offender_no: offender_no)
-        expect(JSON.parse(response.body))
-          .to eq(JSON.parse({
-                              sourceUser: post_body.fetch(:sourceUser),
-                              notes: post_body.fetch(:notes),
-                              offenderNo: offender_no,
-                              level: post_body.fetch(:level),
-                              sourceSystem: "hardcoded-oauth-client-id",
-                              createdTimeStamp: complexity.created_at,
-                            }.to_json))
+        expect(response_json)
+          .to eq json_object(sourceUser: post_body.fetch(:sourceUser),
+                             notes: post_body.fetch(:notes),
+                             offenderNo: offender_no,
+                             level: post_body.fetch(:level),
+                             sourceSystem: "hardcoded-oauth-client-id",
+                             createdTimeStamp: complexity.created_at)
       end
     end
 
@@ -154,11 +144,9 @@ RSpec.describe "Complexities", type: :request do
       end
 
       it "includes validation errors in the response" do
-        expect(JSON.parse(response.body))
-          .to eq(JSON.parse({
-                              message: "Validation error",
-                              errors: { level: ["Must be low, medium or high"] },
-                            }.to_json))
+        expect(response_json)
+          .to eq json_object(message: "Validation error",
+                             errors: { level: ["Must be low, medium or high"] })
       end
     end
 
@@ -174,12 +162,19 @@ RSpec.describe "Complexities", type: :request do
       end
 
       it "includes validation errors in the response" do
-        expect(JSON.parse(response.body))
-          .to eq(JSON.parse({
-                              message: "Validation error",
-                              errors: { level: ["Must be low, medium or high"] },
-                            }.to_json))
+        expect(response_json)
+          .to eq json_object(message: "Validation error",
+                             errors: { level: ["Must be low, medium or high"] })
       end
     end
+  end
+
+private
+
+  # Run the supplied object through a JSON encode/decode cycle
+  # Useful when comparing non-string values against a JSON response
+  # e.g. date objects will be serialized and re-hydrated as strings
+  def json_object(object)
+    JSON.parse(object.to_json)
   end
 end
