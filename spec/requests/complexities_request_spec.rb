@@ -169,6 +169,103 @@ RSpec.describe "Complexities", type: :request do
     end
   end
 
+  describe "POST /complexity-of-need/multiple/offender-no" do
+    context "with a missing or invalid request body" do
+      before do
+        post "/complexity-of-need/multiple/offender-no"
+      end
+
+      it "returns HTTP 400 Bad Request" do
+        expect(response).to have_http_status :bad_request
+      end
+
+      it "includes an error message" do
+        expect(response_json)
+          .to eq json_object(message: "You must provide a JSON array of NOMIS Offender Numbers in the request body")
+      end
+    end
+
+    context "with an empty array" do
+      before do
+        post "/complexity-of-need/multiple/offender-no", params: [], as: :json
+      end
+
+      it "returns an empty array" do
+        expect(response_json).to eq json_object([])
+      end
+    end
+
+    context "with multiple offender numbers" do
+      let(:offender_with_multiple_levels) { "Offender1" }
+      let(:offender_with_one_level) { "Offender2" }
+      let(:offender_without_levels) { "Offender3" }
+
+      let(:expected_response) {
+        [offender_with_one_level, offender_with_multiple_levels].map do |offender|
+          # Find the most recent Complexity for this offender
+          most_recent = Complexity.order(created_at: :desc).where(offender_no: offender).first
+          {
+            offenderNo: offender,
+            level: most_recent.level,
+            sourceSystem: most_recent.source_system,
+            sourceUser: most_recent.source_user,
+            notes: most_recent.notes,
+            createdTimeStamp: most_recent.created_at,
+          }.compact # Remove nil values – sourceUser and notes are optional
+        end
+      }
+
+      let(:post_body) { [offender_with_one_level, offender_with_multiple_levels, offender_without_levels] }
+
+      before do
+        create_list(:complexity, 10, :random_date, offender_no: offender_with_multiple_levels)
+        create(:complexity, :random_date, :with_user, :with_notes, offender_no: offender_with_one_level)
+
+        post "/complexity-of-need/multiple/offender-no", params: post_body, as: :json
+      end
+
+      it "returns an array of the current Complexity level for each offender" do
+        expect(response_json).to match_array json_object(expected_response)
+      end
+
+      it "does not include offenders who don't have a Complexity level" do
+        returned_offenders = response_json.map { |complexity| complexity.fetch("offenderNo") }
+        expect(returned_offenders).not_to include(offender_without_levels)
+      end
+    end
+
+    context "with lots of offenders" do
+      # Generate 1000 offender numbers
+      let(:offenders) { (1..1000).map { |n| "Offender#{n}" } }
+
+      let(:expected_response) {
+        offenders.map do |offender|
+          # Find the most recent Complexity for this offender
+          most_recent = Complexity.order(created_at: :desc).where(offender_no: offender).first
+          {
+            offenderNo: offender,
+            level: most_recent.level,
+            sourceSystem: most_recent.source_system,
+            createdTimeStamp: most_recent.created_at,
+          }
+        end
+      }
+
+      before do
+        # Generate a Complexity for each offender
+        offenders.each { |offender|
+          create(:complexity, :random_date, offender_no: offender)
+        }
+
+        post "/complexity-of-need/multiple/offender-no", params: offenders, as: :json
+      end
+
+      it "returns all records without paginating" do
+        expect(response_json).to match_array json_object(expected_response)
+      end
+    end
+  end
+
 private
 
   # Run the supplied object through a JSON encode/decode cycle

@@ -8,4 +8,11 @@ class Complexity < ApplicationRecord
     in: VALID_LEVELS, allow_nil: false,
     message: "Must be low, medium or high"
   }
+
+  # Get the latest/current Complexity for the given offenders
+  def self.latest_for_offenders(offender_nos)
+    self.select("DISTINCT ON (offender_no) *")
+        .order(:offender_no, created_at: :desc)
+        .where(offender_no: offender_nos)
+  end
 end

@@ -21,6 +21,8 @@ RSpec.configure do |config|
         title: "API V1",
         version: "v1",
       },
+      consumes: ["application/json"],
+      produces: ["application/json"],
       components: {
         schemas: {
           Level: {
@@ -29,14 +31,15 @@ RSpec.configure do |config|
             description: "Complexity of Need Level",
             example: Complexity::VALID_LEVELS.first,
           },
+          OffenderNo: {
+            type: :string,
+            description: "NOMIS Offender Number",
+            example: "A0000AA",
+          },
           ComplexityOfNeed: {
             type: :object,
             properties: {
-              offenderNo: {
-                type: :string,
-                description: "NOMIS Offender Number",
-                example: "A0000AA",
-              },
+              offenderNo: { "$ref" => "#/components/schemas/OffenderNo" },
               level: { "$ref" => "#/components/schemas/Level" },
               sourceUser: {
                 type: :string,

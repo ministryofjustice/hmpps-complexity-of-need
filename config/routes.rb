@@ -9,5 +9,6 @@ Rails.application.routes.draw do
   defaults format: :json do
     get "/complexity-of-need/offender-no/:offender_no" => "complexities#show"
     post "/complexity-of-need/offender-no/:offender_no" => "complexities#create"
+    post "/complexity-of-need/multiple/offender-no" => "complexities#multiple"
   end
 end

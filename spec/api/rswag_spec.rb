@@ -14,7 +14,7 @@ describe "Complexity API" do
               description: "NOMIS Offender Number", example: "A0000AA"
 
     get "Retrieves the current complexity" do
-      produces "application/json"
+      tags "Single Offender"
 
       response "200", "Offender's current Complexity of Need level found" do
         before do
@@ -36,9 +36,8 @@ describe "Complexity API" do
     end
 
     post "Store a new Complexity of Need entry for the given NOMIS Offender Number" do
+      tags "Single Offender"
       description "Requires role: `CHANGE_COMPLEXITY`"
-      consumes "application/json"
-      produces "application/json"
 
       parameter name: :body, in: :body, schema: { "$ref" => "#/components/schemas/NewComplexityOfNeed" }
 
@@ -55,6 +54,39 @@ describe "Complexity API" do
         let(:offender_no) { "G4273GI" }
         let(:body) { { level: "potato" } }
 
+        run_test!
+      end
+    end
+  end
+
+  path "/complexity-of-need/multiple/offender-no" do
+    post "Retrieve Complexity of Need entries for the given set of NOMIS Offender Numbers" do
+      tags "Multiple Offenders"
+      description <<~DESC
+        This endpoint returns a JSON array containing the current Complexity of Need entry for multiple offenders.
+
+        The response array:
+          - will exclude offenders whose Complexity of Need level is not known (i.e. these would result in a `404 Not Found` error on the single `GET` endpoint)
+          - is not sorted in the same order as the request body
+          - is not paginated
+      DESC
+
+      parameter name: :body, in: :body, schema: {
+        type: :array,
+        items: { "$ref" => "#/components/schemas/OffenderNo" },
+        description: "A JSON array of NOMIS Offender Numbers",
+        example: %w[A0000AA B0000BB C0000CC],
+      }
+
+      response "200", "OK" do
+        schema type: :array, items: { "$ref" => "#/components/schemas/ComplexityOfNeed" }
+
+        let(:body) { %w[G4273GI A1111AA] }
+
+        run_test!
+      end
+
+      response "400", "The request body was invalid. Make sure you've provided a JSON array of NOMIS Offender Numbers." do
         run_test!
       end
     end

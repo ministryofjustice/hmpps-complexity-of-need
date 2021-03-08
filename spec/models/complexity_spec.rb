@@ -34,4 +34,41 @@ RSpec.describe Complexity, type: :model do
       end
     end
   end
+
+  describe ".latest_for_offenders" do
+    subject { described_class.latest_for_offenders(offenders) }
+
+    let(:offenders) { [offender_with_multiple_levels, offender_with_one_level, offender_without_levels] }
+    let(:offender_with_multiple_levels) { "Offender1" }
+    let(:offender_with_one_level) { "Offender2" }
+    let(:offender_without_levels) { "Offender3" }
+    let(:some_other_offender) { "Offender4" } # we don't want get this offender's complexity level
+
+    before do
+      # Create 10 entries for offender_with_multiple_levels
+      create_list(:complexity, 10, :random_date, offender_no: offender_with_multiple_levels)
+
+      # Create 1 entry for offender_with_one_level
+      create(:complexity, :random_date, offender_no: offender_with_one_level)
+
+      # Create nothing for offender_without_levels
+
+      # Create entries for some_other_offender
+      create_list(:complexity, 5, :random_date, offender_no: some_other_offender)
+    end
+
+    it "only returns offenders who have a Complexity level" do
+      returned_offenders = subject.map(&:offender_no)
+      expect(returned_offenders).not_to include(offender_without_levels)
+      expect(returned_offenders).to contain_exactly(offender_with_multiple_levels, offender_with_one_level)
+    end
+
+    it "returns the latest/current Complexity level for each offender" do
+      offenders.each do |offender|
+        most_recent = described_class.where(offender_no: offender).order(created_at: :desc).limit(1)
+        actual = subject.select { |complexity| complexity.offender_no == offender }
+        expect(actual).to eq(most_recent)
+      end
+    end
+  end
 end

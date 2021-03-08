@@ -14,6 +14,12 @@ class ComplexitiesController < ApplicationController
     render "show"
   end
 
+  def multiple
+    return missing_offender_numbers unless params["_json"].is_a? Array
+
+    @complexities = Complexity.latest_for_offenders(params["_json"])
+  end
+
 private
 
   def not_found
@@ -22,6 +28,10 @@ private
 
   def validation_error(error)
     render json: { message: "Validation error", errors: error.record.errors }, status: :bad_request
+  end
+
+  def missing_offender_numbers
+    render json: { message: "You must provide a JSON array of NOMIS Offender Numbers in the request body" }, status: :bad_request
   end
 
   def create_params
