@@ -24,3 +24,4 @@
 # Ignore generated swagger definition
 # This is created dynamically by running: rake rswag
 /swagger
+.env
