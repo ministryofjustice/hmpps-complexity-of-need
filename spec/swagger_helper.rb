@@ -16,10 +16,29 @@ RSpec.configure do |config|
   # the root example_group in your specs, e.g. describe '...', swagger_doc: 'v2/swagger.json'
   config.swagger_docs = {
     "v1/swagger.yaml" => {
+      basePath: "/v1",
       openapi: "3.0.1",
       info: {
-        title: "API V1",
+        title: "Complexity of Need API",
         version: "v1",
+        description: <<~DESC,
+          A microservice which holds the Complexity of Need level associated with offenders
+
+          ### Authentication
+
+          This API is secured by OAuth 2 with tokens supplied by HMPPS Auth.
+
+          Read permissions are granted to any authorised client. No particular role is required.
+
+          Write permissions are granted to clients with the role `ROLE_COMPLEXITY_OF_NEED` and a `write` scope.
+
+          ---
+
+          Owned by the **Manage POM Cases** team
+
+          - Slack: [#ask_moic_pvb](https://mojdt.slack.com/channels/ask_moic_pvb)
+          - GitHub: [ministryofjustice/hmpps-complexity-of-need](https://github.com/ministryofjustice/hmpps-complexity-of-need)
+        DESC
       },
       consumes: ["application/json"],
       produces: ["application/json"],
@@ -84,15 +103,29 @@ RSpec.configure do |config|
           },
         },
       },
+      tags: [
+        {
+          name: "Single Offender",
+          description: "Access Complexity of Need for a single offender",
+        },
+        {
+          name: "Multiple Offenders",
+          description: "Access Complexity of Need for multiple offenders at once",
+        },
+      ],
       paths: {},
       servers: [
         {
-          url: "https://{defaultHost}",
-          variables: {
-            defaultHost: {
-              default: "www.example.com",
-            },
-          },
+          url: "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1",
+          description: "Staging/dev environment",
+        },
+        {
+          url: "https://complexity-of-need-preprod.hmpps.service.justice.gov.uk/v1",
+          description: "Pre-production environment",
+        },
+        {
+          url: "https://complexity-of-need.hmpps.service.justice.gov.uk/v1",
+          description: "Production environment",
         },
       ],
     },

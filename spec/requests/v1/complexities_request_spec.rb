@@ -5,11 +5,12 @@ require "rails_helper"
 RSpec.describe "Complexities", type: :request do
   let(:response_json) { JSON.parse(response.body) }
 
-  describe "GET /complexity-of-need/offender-no/:offender_no" do
+  describe "GET /v1/complexity-of-need/offender-no/:offender_no" do
+    let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}" }
     let(:offender_no) { complexity.offender_no }
 
     before do
-      get "/complexity-of-need/offender-no/#{offender_no}"
+      get endpoint
     end
 
     context "when default" do
@@ -68,7 +69,7 @@ RSpec.describe "Complexities", type: :request do
           create(:complexity, offender_no: different_offender_no, created_at: date, updated_at: date)
         end
 
-        get "/complexity-of-need/offender-no/#{offender_no}"
+        get endpoint
       end
 
       it "returns the most recent one for the specified offender" do
@@ -83,11 +84,12 @@ RSpec.describe "Complexities", type: :request do
     end
   end
 
-  describe "POST /complexity-of-need/offender-no/:offender_no" do
+  describe "POST /v1/complexity-of-need/offender-no/:offender_no" do
+    let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}" }
     let(:offender_no) { "ABC123" }
 
     before do
-      post "/complexity-of-need/offender-no/#{offender_no}", params: post_body, as: :json
+      post endpoint, params: post_body, as: :json
     end
 
     context "with only mandatory fields" do
@@ -169,10 +171,12 @@ RSpec.describe "Complexities", type: :request do
     end
   end
 
-  describe "POST /complexity-of-need/multiple/offender-no" do
+  describe "POST /v1/complexity-of-need/multiple/offender-no" do
+    let(:endpoint) { "/v1/complexity-of-need/multiple/offender-no" }
+
     context "with a missing or invalid request body" do
       before do
-        post "/complexity-of-need/multiple/offender-no"
+        post endpoint
       end
 
       it "returns HTTP 400 Bad Request" do
@@ -187,10 +191,10 @@ RSpec.describe "Complexities", type: :request do
 
     context "with an empty array" do
       before do
-        post "/complexity-of-need/multiple/offender-no", params: [], as: :json
+        post endpoint, params: [], as: :json
       end
 
-      it "returns an empty array" do
+      it "returns an empty result set" do
         expect(response_json).to eq json_object([])
       end
     end
@@ -221,7 +225,7 @@ RSpec.describe "Complexities", type: :request do
         create_list(:complexity, 10, :random_date, offender_no: offender_with_multiple_levels)
         create(:complexity, :random_date, :with_user, :with_notes, offender_no: offender_with_one_level)
 
-        post "/complexity-of-need/multiple/offender-no", params: post_body, as: :json
+        post endpoint, params: post_body, as: :json
       end
 
       it "returns an array of the current Complexity level for each offender" do
@@ -257,7 +261,7 @@ RSpec.describe "Complexities", type: :request do
           create(:complexity, :random_date, offender_no: offender)
         }
 
-        post "/complexity-of-need/multiple/offender-no", params: offenders, as: :json
+        post endpoint, params: offenders, as: :json
       end
 
       it "returns all records without paginating" do

@@ -8,12 +8,12 @@ require "swagger_helper"
 # rubocop:disable RSpec/DescribeClass
 # rubocop:disable RSpec/EmptyExampleGroup
 # Authorization 'method' needs to be defined for rswag
-describe "Complexity API" do
+describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
   path "/complexity-of-need/offender-no/{offender_no}" do
     parameter name: :offender_no, in: :path, type: :string,
               description: "NOMIS Offender Number", example: "A0000AA"
 
-    get "Retrieves the current complexity" do
+    get "Retrieve the current Complexity of Need level for an offender" do
       tags "Single Offender"
 
       response "200", "Offender's current Complexity of Need level found" do
@@ -35,9 +35,9 @@ describe "Complexity API" do
       end
     end
 
-    post "Store a new Complexity of Need entry for the given NOMIS Offender Number" do
+    post "Update the Complexity of Need level for an offender" do
       tags "Single Offender"
-      description "Requires role: `CHANGE_COMPLEXITY`"
+      description "Clients calling this endpoint must have role: `ROLE_COMPLEXITY_OF_NEED` with scope: `write`"
 
       parameter name: :body, in: :body, schema: { "$ref" => "#/components/schemas/NewComplexityOfNeed" }
 
@@ -60,7 +60,7 @@ describe "Complexity API" do
   end
 
   path "/complexity-of-need/multiple/offender-no" do
-    post "Retrieve Complexity of Need entries for the given set of NOMIS Offender Numbers" do
+    post "Retrieve the current Complexity of Need levels for multiple offenders" do
       tags "Multiple Offenders"
       description <<~DESC
         This endpoint returns a JSON array containing the current Complexity of Need entry for multiple offenders.
