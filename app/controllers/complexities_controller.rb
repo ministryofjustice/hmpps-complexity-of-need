@@ -20,6 +20,11 @@ class ComplexitiesController < ApplicationController
     @complexities = Complexity.latest_for_offenders(params["_json"])
   end
 
+  def history
+    @complexities = Complexity.where(offender_no: params[:offender_no]).order(created_at: :desc)
+    not_found if @complexities.blank?
+  end
+
 private
 
   def not_found

@@ -7,6 +7,7 @@ require "swagger_helper"
 # text as part of the API documentation generated from these tests.
 # rubocop:disable RSpec/DescribeClass
 # rubocop:disable RSpec/EmptyExampleGroup
+# rubocop:disable RSpec/ScatteredSetup
 # Authorization 'method' needs to be defined for rswag
 describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
   path "/complexity-of-need/offender-no/{offender_no}" do
@@ -91,7 +92,36 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
       end
     end
   end
+
+  path "/complexity-of-need/offender-no/{offender_no}/history" do
+    parameter name: :offender_no, in: :path, type: :string,
+              description: "NOMIS Offender Number", example: "A0000AA"
+
+    get "Retrieve full history of Complexity of Needs for an offender" do
+      tags "Single Offender"
+
+      response "200", "Offender's Complexity of Need history found" do
+        before do
+          create(:complexity, :with_user, offender_no: offender_no, created_at: 1.month.ago, updated_at: 1.month.ago)
+          create(:complexity, :with_user, offender_no: offender_no)
+        end
+
+        schema type: :array, items: { "$ref" => "#/components/schemas/ComplexityOfNeed" }
+
+        let(:offender_no) { "G4273GI" }
+
+        run_test!
+      end
+
+      response "404", "The Complexity of Need level for this offender is not known" do
+        let(:offender_no) { "A1111AA" }
+
+        run_test!
+      end
+    end
+  end
 end
 
 # rubocop:enable RSpec/EmptyExampleGroup
 # rubocop:enable RSpec/DescribeClass
+# rubocop:enable RSpec/ScatteredSetup

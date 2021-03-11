@@ -270,6 +270,74 @@ RSpec.describe "Complexities", type: :request do
     end
   end
 
+  describe "GET /v1/complexity-of-need/offender-no/:offender_no/history" do
+    let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}/history" }
+    let(:different_offender_no) { "XYZ456" }
+
+    before do
+      get endpoint
+    end
+
+    context "when offender not found" do
+      let(:offender_no) { "non_existent_offender" }
+
+      it "returns 404" do
+        expect(response).to have_http_status :not_found
+      end
+
+      it "includes an error message" do
+        expect(response_json).to eq json_object(message: "No record found for that offender")
+      end
+    end
+
+    context "with a single entry" do
+      let!(:complexity) { create(:complexity) }
+      let(:offender_no) { complexity.offender_no }
+
+      it "returns an array" do
+        expect(response_json).to be_an(Array)
+      end
+
+      it "returns the single complexity record" do
+        expect(response_json.size).to eq 1
+        expect(response_json.first).to eq json_object(level: complexity.level,
+                                                      offenderNo: complexity.offender_no,
+                                                      createdTimeStamp: complexity.created_at,
+                                                      sourceSystem: complexity.source_system)
+      end
+    end
+
+    context "with multiple entries" do
+      let(:offender_no) { "1234567" }
+
+      before do
+        # Populate database with multiple records for multiple offenders
+        [1.month.ago, 3.weeks.ago, 1.week.ago, 1.day.ago].each do |date|
+          create(:complexity, created_at: date, updated_at: date)
+          create(:complexity, offender_no: different_offender_no, created_at: date, updated_at: date)
+        end
+
+        get endpoint
+      end
+
+      it "returns an array" do
+        expect(response_json).to be_an(Array)
+        expect(response_json.size).to eq 4
+      end
+
+      it "displays all the records for the offender in descending order" do
+        history = Complexity.order(created_at: :desc).where(offender_no: offender_no)
+
+        response_json.each_with_index do |json, index|
+          expect(json).to eq json_object(level: history[index].level,
+                                         offenderNo: history[index].offender_no,
+                                         createdTimeStamp: history[index].created_at,
+                                         sourceSystem: history[index].source_system)
+        end
+      end
+    end
+  end
+
 private
 
   # Run the supplied object through a JSON encode/decode cycle
