@@ -40,9 +40,25 @@ RSpec.configure do |config|
           - GitHub: [ministryofjustice/hmpps-complexity-of-need](https://github.com/ministryofjustice/hmpps-complexity-of-need)
         DESC
       },
-      consumes: ["application/json"],
-      produces: ["application/json"],
+      # Defaults for all endpoints:
+      consumes: ["application/json"], # Only accept JSON payloads
+      produces: ["application/json"], # Only return JSON responses
+      security: [HmppsAuth: %w[read]], # Require a valid HMPPS Auth token with "read" scope
       components: {
+        securitySchemes: {
+          HmppsAuth: {
+            type: :oauth2,
+              # HMPPS Auth uses the 'client credentials' oAuth 2 flow: https://swagger.io/docs/specification/authentication/oauth2/
+              flows: {
+                clientCredentials: {
+                scopes: {
+                  read: "Grants read access",
+                  write: "Grants write access",
+                },
+              },
+            },
+          },
+        },
         schemas: {
           Level: {
             type: :string,

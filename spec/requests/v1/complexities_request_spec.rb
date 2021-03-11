@@ -279,7 +279,7 @@ RSpec.describe "Complexities", type: :request do
     let(:different_offender_no) { "XYZ456" }
 
     before do
-      get endpoint
+      get endpoint, headers: request_headers
     end
 
     context "when offender not found" do
@@ -321,7 +321,7 @@ RSpec.describe "Complexities", type: :request do
           create(:complexity, offender_no: different_offender_no, created_at: date, updated_at: date)
         end
 
-        get endpoint
+        get endpoint, headers: request_headers
       end
 
       it "returns an array" do
