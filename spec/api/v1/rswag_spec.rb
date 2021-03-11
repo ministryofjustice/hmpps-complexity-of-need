@@ -7,12 +7,11 @@ require "swagger_helper"
 # text as part of the API documentation generated from these tests.
 # rubocop:disable RSpec/DescribeClass
 # rubocop:disable RSpec/EmptyExampleGroup
-# Authorization 'method' needs to be defined for rswag
 describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
-  let(:authorization) { auth_header }
+  # Authorization header needs to be defined for rswag
+  let(:Authorization) { auth_header } # rubocop:disable RSpec/VariableName
 
   path "/complexity-of-need/offender-no/{offender_no}" do
-    parameter name: :authorization, in: :header, type: :string
     parameter name: :offender_no, in: :path, type: :string,
               description: "NOMIS Offender Number", example: "A0000AA"
 
@@ -74,7 +73,6 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
           - is not paginated
       DESC
 
-      parameter name: :authorization, in: :header, type: :string
       parameter name: :body, in: :body, schema: {
         type: :array,
         items: { "$ref" => "#/components/schemas/OffenderNo" },
