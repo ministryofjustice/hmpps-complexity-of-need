@@ -37,8 +37,6 @@ module HmppsApi
     private
 
       def jwks_hash
-        jwks_raw = Net::HTTP.get URI("#{Rails.configuration.nomis_oauth_host}/auth/.well-known/jwks.json")
-        jwks_keys = Array(JSON.parse(jwks_raw)["keys"])
         # a combo of https://auth0.com/docs/quickstart/backend/rails/01-authorization?_ga=2.125705866.1258815838.1614860254-689132663.1593072635#configure-auth0-apis
         # and https://gist.github.com/trojkac/a78d5af6c62cc743dad6fbd7e337701b (as we don't have an x5c certificate)
         Hash[
@@ -52,6 +50,19 @@ module HmppsApi
             ]
           end
         ]
+      end
+
+      def jwks_keys
+        # Cache calls to this resource – it doesn't change frequently
+        Rails.cache.fetch("hmpps_auth_jwks_keys", expires_in: 24.hours) do
+          client = Faraday.new(Rails.configuration.nomis_oauth_host) do |conn|
+            # Raise errors for bad HTTP responses
+            conn.response :raise_error
+          end
+
+          response = client.get "/auth/.well-known/jwks.json"
+          JSON.parse(response.body).fetch("keys")
+        end
       end
     end
   end
