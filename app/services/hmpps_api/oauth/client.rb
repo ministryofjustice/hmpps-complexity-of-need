@@ -3,8 +3,6 @@
 module HmppsApi
   module Oauth
     class Client
-      include ClientHelper
-
       def initialize(host)
         @host = host
         @connection = Faraday.new do |faraday|
@@ -26,6 +24,12 @@ module HmppsApi
         }
 
         JSON.parse(response.body)
+      end
+
+      def authorisation
+        "Basic " + Base64.urlsafe_encode64(
+          "#{Rails.configuration.nomis_oauth_client_id}:#{Rails.configuration.nomis_oauth_client_secret}",
+          )
       end
     end
   end
