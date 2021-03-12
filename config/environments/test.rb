@@ -51,5 +51,6 @@ Rails.application.configure do
 
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
-  config.complexity_of_need_host = "http://localhost:3000"
+
+  Rails.application.routes.default_url_options[:host] = 'http://localhost:3000'
 end

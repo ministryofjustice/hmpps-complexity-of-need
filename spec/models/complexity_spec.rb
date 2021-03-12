@@ -24,7 +24,7 @@ RSpec.describe Complexity, type: :model do
   }
   let(:url) {
     {
-      string_value: "http://localhost:3000/complexity-of-need/offender-no/#{complexity.offender_no}",
+      string_value: Rails.application.routes.url_helpers.complexity_of_need_single_url(complexity.offender_no),
       data_type: "String",
     }
   }
