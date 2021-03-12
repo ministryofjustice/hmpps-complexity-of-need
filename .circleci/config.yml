@@ -208,7 +208,6 @@ workflows:
             branches:
               only:
                 - main
-                - mo418-add-hosting-infrastructure
       - deploy_staging:
           requires:
             - build_and_push_docker_image
@@ -216,4 +215,3 @@ workflows:
             branches:
               only:
                 - main
-                - mo418-add-hosting-infrastructure
