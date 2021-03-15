@@ -9,8 +9,18 @@ spec:
   tls:
   - hosts:
     - hmpps-complexity-of-need-staging.apps.live-1.cloud-platform.service.justice.gov.uk
+  - hosts:
+    - complexity-of-need-staging.hmpps.service.justice.gov.uk
+    secretName: staging-cert
   rules:
   - host: hmpps-complexity-of-need-staging.apps.live-1.cloud-platform.service.justice.gov.uk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: hmpps-complexity-of-need
+          servicePort: 3000
+  - host: complexity-of-need-staging.hmpps.service.justice.gov.uk
     http:
       paths:
       - path: /
