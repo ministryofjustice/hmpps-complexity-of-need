@@ -34,12 +34,12 @@ group :development, :test do
   gem "factory_bot_rails"
   gem "rspec-rails"
   gem "rswag-specs"
-
   gem "rubocop"
   gem "rubocop-govuk", "~> 2.0"
   gem "rubocop-performance"
   gem "rubocop-rails"
   gem "rubocop-rspec"
+  gem "timecop"
 end
 
 group :development do

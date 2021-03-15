@@ -13,6 +13,7 @@ module HmppsApi
                              algorithms: "RS256",
                              iss: "#{Rails.configuration.nomis_oauth_host}/auth/issuer",
                              verify_iss: true,
+                             verify_expiration: true, # Raises error JWT::ExpiredSignature if the token has expired
                              verify_aud: false) do |header|
           jwks_hash[header["kid"]]
         end
@@ -22,12 +23,12 @@ module HmppsApi
         @access_token = access_token
       end
 
-      def expired?
-        @payload.fetch("exp") < Time.zone.now.to_i
+      def has_role?(role)
+        @payload.fetch("authorities", []).include?(role)
       end
 
-      def valid_token_with_scope?(scope)
-        @payload.fetch("scope", []).include?(scope) && !expired?
+      def has_scope?(scope)
+        @payload.fetch("scope", []).include?(scope)
       end
 
       def self.from_json(payload)

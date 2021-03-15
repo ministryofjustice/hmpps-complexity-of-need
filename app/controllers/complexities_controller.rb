@@ -5,6 +5,10 @@ class ComplexitiesController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
   rescue_from ActiveRecord::RecordInvalid, with: :validation_error
 
+  # Require write permissions to create new records
+  skip_before_action :authorise_read!,  only: [:create]
+  before_action      :authorise_write!, only: [:create]
+
   def show
     @complexity = Complexity.order(created_at: :desc).find_by!(offender_no: params[:offender_no])
   end

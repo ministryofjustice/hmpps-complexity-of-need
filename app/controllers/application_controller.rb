@@ -1,27 +1,46 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
-  before_action :authenticate!
+  # The HMPPS Auth role required for 'write' endpoints
+  WRITE_ROLE = "ROLE_COMPLEXITY_OF_NEED"
+
+  before_action :authorise_read!
+
+  rescue_from JWT::DecodeError, with: :render_bad_token
 
 private
 
-  def authenticate!
-    access_token = parse_access_token(request.headers["AUTHORIZATION"])
-
-    token = HmppsApi::Oauth::Token.new(access_token)
-    unless token.valid_token_with_scope?("read")
-      render_unauthorized("Valid authorisation token required")
+  def authorise_read!
+    if token.nil?
+      render_bad_token
+    elsif token.has_scope?("read") == false
+      render_forbidden "You need the scope 'read' to use this endpoint"
     end
   end
 
-  def parse_access_token(auth_header)
-    return nil if auth_header.nil?
-    return nil unless auth_header.starts_with?("Bearer")
-
-    auth_header.split.last
+  def authorise_write!
+    if token.nil?
+      render_bad_token
+    elsif (token.has_scope?("write") && token.has_role?(WRITE_ROLE)) == false
+      render_forbidden "You need the role '#{WRITE_ROLE}' with scope 'write' to use this endpoint"
+    end
   end
 
-  def render_unauthorized(msg)
-    render json: { status: "error", message: msg }, status: :unauthorized
+  def token
+    @token ||= begin
+                 auth_header = request.headers["Authorization"]
+                 if auth_header.present? && auth_header.starts_with?("Bearer")
+                   access_token = auth_header.split.last
+                   HmppsApi::Oauth::Token.new(access_token)
+                 end
+               end
+  end
+
+  def render_bad_token
+    render json: { message: "Missing or invalid access token" }, status: :unauthorized
+  end
+
+  def render_forbidden(message)
+    render json: { message: message }, status: :forbidden
   end
 end

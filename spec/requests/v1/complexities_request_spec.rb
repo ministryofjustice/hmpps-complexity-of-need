@@ -91,6 +91,61 @@ RSpec.describe "Complexities", type: :request do
                                sourceSystem: most_recent.source_system)
       end
     end
+
+    context "when the client doesn't have the 'read' scope" do
+      let(:offender_no) { "ABC123" }
+
+      before do
+        stub_access_token scopes: []
+        get endpoint, headers: request_headers
+      end
+
+      it "returns HTTP 403 Forbidden" do
+        expect(response).to have_http_status :forbidden
+      end
+
+      it "includes validation errors in the response" do
+        expect(response_json)
+          .to eq json_object(message: "You need the scope 'read' to use this endpoint")
+      end
+    end
+
+    context "when the client is unauthenticated" do
+      let(:offender_no) { "ABC123" }
+
+      before do
+        get endpoint # don't include an Authorization header
+      end
+
+      it "returns HTTP 401 Unauthorized" do
+        expect(response).to have_http_status :unauthorized
+      end
+
+      it "includes validation errors in the response" do
+        expect(response_json)
+          .to eq json_object(message: "Missing or invalid access token")
+      end
+    end
+
+    context "when the client's token has expired" do
+      let(:offender_no) { "ABC123" }
+
+      before do
+        # Travel into the future to expire the access token
+        Timecop.travel(Time.zone.today + 1.year) do
+          get endpoint, headers: request_headers
+        end
+      end
+
+      it "returns HTTP 401 Unauthorized" do
+        expect(response).to have_http_status :unauthorized
+      end
+
+      it "includes validation errors in the response" do
+        expect(response_json)
+          .to eq json_object(message: "Missing or invalid access token")
+      end
+    end
   end
 
   describe "POST /v1/complexity-of-need/offender-no/:offender_no" do
@@ -176,6 +231,42 @@ RSpec.describe "Complexities", type: :request do
         expect(response_json)
           .to eq json_object(message: "Validation error",
                              errors: { level: ["Must be low, medium or high"] })
+      end
+    end
+
+    context "without role ROLE_COMPLEXITY_OF_NEED" do
+      let(:post_body) { nil }
+
+      before do
+        stub_access_token scopes: %w[read write], roles: %w[SOME_OTHER_ROLE]
+        post endpoint, params: post_body, as: :json, headers: request_headers
+      end
+
+      it "returns HTTP 403 Forbidden" do
+        expect(response).to have_http_status :forbidden
+      end
+
+      it "includes validation errors in the response" do
+        expect(response_json)
+          .to eq json_object(message: "You need the role 'ROLE_COMPLEXITY_OF_NEED' with scope 'write' to use this endpoint")
+      end
+    end
+
+    context "without write scope" do
+      let(:post_body) { nil }
+
+      before do
+        stub_access_token scopes: %w[read], roles: %w[ROLE_COMPLEXITY_OF_NEED]
+        post endpoint, params: post_body, as: :json, headers: request_headers
+      end
+
+      it "returns HTTP 403 Forbidden" do
+        expect(response).to have_http_status :forbidden
+      end
+
+      it "includes validation errors in the response" do
+        expect(response_json)
+          .to eq json_object(message: "You need the role 'ROLE_COMPLEXITY_OF_NEED' with scope 'write' to use this endpoint")
       end
     end
   end
@@ -277,6 +368,22 @@ RSpec.describe "Complexities", type: :request do
         expect(response_json).to match_array json_object(expected_response)
       end
     end
+
+    context "when the client doesn't have the 'read' scope" do
+      before do
+        stub_access_token scopes: []
+        post endpoint, params: [], as: :json, headers: request_headers
+      end
+
+      it "returns HTTP 403 Forbidden" do
+        expect(response).to have_http_status :forbidden
+      end
+
+      it "includes validation errors in the response" do
+        expect(response_json)
+          .to eq json_object(message: "You need the scope 'read' to use this endpoint")
+      end
+    end
   end
 
   describe "GET /v1/complexity-of-need/offender-no/:offender_no/history" do
@@ -343,6 +450,24 @@ RSpec.describe "Complexities", type: :request do
                                          createdTimeStamp: history[index].created_at,
                                          sourceSystem: history[index].source_system)
         end
+      end
+    end
+
+    context "when the client doesn't have the 'read' scope" do
+      let(:offender_no) { "1234567" }
+
+      before do
+        stub_access_token scopes: []
+        get endpoint, headers: request_headers
+      end
+
+      it "returns HTTP 403 Forbidden" do
+        expect(response).to have_http_status :forbidden
+      end
+
+      it "includes validation errors in the response" do
+        expect(response_json)
+          .to eq json_object(message: "You need the scope 'read' to use this endpoint")
       end
     end
   end
