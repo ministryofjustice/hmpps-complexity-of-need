@@ -15,27 +15,42 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
 
   before do
     allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
-    create(:complexity, :with_user, offender_no: "G4273GI")
   end
 
   path "/complexity-of-need/offender-no/{offender_no}" do
     parameter name: :offender_no, in: :path, type: :string,
               description: "NOMIS Offender Number", example: "A0000AA"
 
+    let(:offender_no) { "G4273GI" }
+
     get "Retrieve the current Complexity of Need level for an offender" do
       tags "Single Offender"
 
       response "200", "Offender's current Complexity of Need level found" do
+        before do
+          create(:complexity, :with_user, offender_no: offender_no)
+        end
+
         schema "$ref" => "#/components/schemas/ComplexityOfNeed"
 
-        let(:offender_no) { "G4273GI" }
+        run_test!
+      end
+
+      response "401", "Invalid or missing access token" do
+        let(:Authorization) { nil } # rubocop:disable RSpec/VariableName
+
+        run_test!
+      end
+
+      response "403", "Access token is missing scope `read`" do
+        before do
+          stub_access_token scopes: []
+        end
 
         run_test!
       end
 
       response "404", "The Complexity of Need level for this offender is not known" do
-        let(:offender_no) { "A1111AA" }
-
         run_test!
       end
     end
@@ -49,15 +64,27 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
       response "200", "Complexity of Need level set successfully" do
         schema "$ref" => "#/components/schemas/ComplexityOfNeed"
 
-        let(:offender_no) { "G4273GI" }
         let(:body) { { level: "medium" } }
 
         run_test!
       end
 
       response "400", "There were validation errors. Make sure you've given a valid level." do
-        let(:offender_no) { "G4273GI" }
         let(:body) { { level: "potato" } }
+
+        run_test!
+      end
+
+      response "401", "Invalid or missing access token" do
+        let(:Authorization) { nil } # rubocop:disable RSpec/VariableName
+
+        run_test!
+      end
+
+      response "403", "Access token is missing role `ROLE_COMPLEXITY_OF_NEED` or scope `write`" do
+        before do
+          stub_access_token scopes: %w[read], roles: %w[SOME_OTHER_ROLE]
+        end
 
         run_test!
       end
@@ -94,6 +121,20 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
       response "400", "The request body was invalid. Make sure you've provided a JSON array of NOMIS Offender Numbers." do
         run_test!
       end
+
+      response "401", "Invalid or missing access token" do
+        let(:Authorization) { nil } # rubocop:disable RSpec/VariableName
+
+        run_test!
+      end
+
+      response "403", "Access token is missing scope `read`" do
+        before do
+          stub_access_token scopes: []
+        end
+
+        run_test!
+      end
     end
   end
 
@@ -101,8 +142,11 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
     parameter name: :offender_no, in: :path, type: :string,
               description: "NOMIS Offender Number", example: "A0000AA"
 
+    let(:offender_no) { "G4273GI" }
+
     get "Retrieve full history of Complexity of Needs for an offender" do
       tags "Single Offender"
+      description "Results are sorted chronologically (newest first, oldest last)"
 
       response "200", "Offender's Complexity of Need history found" do
         before do
@@ -112,14 +156,24 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
 
         schema type: :array, items: { "$ref" => "#/components/schemas/ComplexityOfNeed" }
 
-        let(:offender_no) { "G4273GI" }
+        run_test!
+      end
+
+      response "401", "Invalid or missing access token" do
+        let(:Authorization) { nil } # rubocop:disable RSpec/VariableName
+
+        run_test!
+      end
+
+      response "403", "Access token is missing scope `read`" do
+        before do
+          stub_access_token scopes: []
+        end
 
         run_test!
       end
 
       response "404", "The Complexity of Need level for this offender is not known" do
-        let(:offender_no) { "A1111AA" }
-
         run_test!
       end
     end
