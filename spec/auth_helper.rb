@@ -7,10 +7,8 @@ module AuthHelper
     oauth_client = HmppsApi::Oauth::Client.new(Rails.configuration.nomis_oauth_host)
     route = "/auth/oauth/token?grant_type=client_credentials"
     response = oauth_client.post(route)
-
-    token = HmppsApi::Oauth::Token.from_json(response)
-
-    "Bearer #{token.access_token}"
+    access_token = response.fetch("access_token")
+    "Bearer #{access_token}"
   end
 
   # Mock the client's access token with the specified scopes and roles
