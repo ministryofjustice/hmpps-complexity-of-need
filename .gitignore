@@ -17,12 +17,14 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Ignore config files needed for local development
 /.idea
 *.iml
 .ruby-gemset
 .env
+Brewfile.lock.json
 
 # Ignore generated swagger definition
 # This is created dynamically by running: rake rswag
 /swagger
-.env

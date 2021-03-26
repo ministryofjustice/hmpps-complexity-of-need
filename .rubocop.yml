@@ -18,6 +18,7 @@ AllCops:
     - 'spec/rails_helper.rb'
     - 'bin/*'
     - 'config/environments/*.rb'
+    - 'Brewfile'
 
 RSpec/NamedSubject:
   Enabled: false
