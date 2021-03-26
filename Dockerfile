@@ -48,6 +48,10 @@ RUN bundle install --without development test --jobs 2 --retry 3
 
 COPY . /app
 
+# Record the SHA1 git commit reference in /app/RELEASE
+# This file is automatically used by Sentry to track releases
+RUN echo -n "$APP_GIT_COMMIT" > /app/RELEASE
+
 RUN mkdir -p /home/appuser && \
   useradd appuser -u 1001 --user-group --home /home/appuser && \
   chown -R appuser:appuser /app && \

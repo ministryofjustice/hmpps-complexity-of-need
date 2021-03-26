@@ -24,6 +24,10 @@ gem "rswag-ui"
 
 gem "aws-sdk-sns"
 
+# Sentry error reporting
+gem "sentry-rails"
+gem "sentry-ruby"
+
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
