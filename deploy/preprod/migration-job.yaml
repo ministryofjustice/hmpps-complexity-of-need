@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rails-db-migration
+  labels:
+    app: hmpps-complexity-of-need-migration
+spec:
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      containers:
+        - name: hmpps-complexity-of-need-migration
+          image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/hmpps-complexity-of-need:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', 'bundle exec rails db:migrate && bundle exec rails db:seed']
+          envFrom:
+            - configMapRef:
+                name: app-environment
+            - secretRef:
+                name: app-environment-secrets
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: rds-instance-output
+                  key: rds_instance_address
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rds-instance-output
+                  key: database_password
+            - name: POSTGRES_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: rds-instance-output
+                  key: database_name
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rds-instance-output
+                  key: database_username
+          resources:
+            limits:
+              memory: "1000Mi"
+              cpu: "1000m"
+            requests:
+              memory: "500Mi"
+              cpu: "50m"
+      restartPolicy: Never
+  backoffLimit: 4

@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: app-ingress
+spec:
+  tls:
+  - hosts:
+    - hmpps-complexity-of-need-production.apps.live-1.cloud-platform.service.justice.gov.uk
+  - hosts:
+    - complexity-of-need.hmpps.service.justice.gov.uk
+    secretName: production-cert
+  rules:
+  - host: hmpps-complexity-of-need-production.apps.live-1.cloud-platform.service.justice.gov.uk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: app-service
+          servicePort: 3000
+  - host: complexity-of-need.hmpps.service.justice.gov.uk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: app-service
+          servicePort: 3000
