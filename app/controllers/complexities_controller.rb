@@ -46,6 +46,6 @@ private
   def create_params
     params.permit(:offender_no, :level, :sourceUser, :notes)
           .transform_keys { |k| k == "sourceUser" ? "source_user" : k } # Convert "sourceUser" key to "source_user"
-          .merge(source_system: "hardcoded-oauth-client-id") # TODO: use the HMPPS oAuth client ID here
+          .merge(source_system: token.client_id)
   end
 end

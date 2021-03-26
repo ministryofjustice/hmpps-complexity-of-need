@@ -140,6 +140,7 @@ RSpec.describe "Complexities", type: :request do
   describe "POST /v1/complexity-of-need/offender-no/:offender_no" do
     let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}" }
     let(:offender_no) { "ABC123" }
+    let(:source_system) { Rails.configuration.nomis_oauth_client_id }
 
     context "with only mandatory fields" do
       let(:post_body) {
@@ -158,7 +159,7 @@ RSpec.describe "Complexities", type: :request do
         expect(response_json)
           .to eq json_object(offenderNo: offender_no,
                              level: post_body.fetch(:level),
-                             sourceSystem: "hardcoded-oauth-client-id",
+                             sourceSystem: source_system,
                              createdTimeStamp: complexity.created_at)
       end
     end
@@ -184,7 +185,7 @@ RSpec.describe "Complexities", type: :request do
                              notes: post_body.fetch(:notes),
                              offenderNo: offender_no,
                              level: post_body.fetch(:level),
-                             sourceSystem: "hardcoded-oauth-client-id",
+                             sourceSystem: source_system,
                              createdTimeStamp: complexity.created_at)
       end
     end

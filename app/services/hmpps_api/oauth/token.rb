@@ -23,6 +23,10 @@ module HmppsApi
         @access_token = access_token
       end
 
+      def client_id
+        @payload.fetch("client_id")
+      end
+
       def has_role?(role)
         @payload.fetch("authorities", []).include?(role)
       end
