@@ -14,6 +14,10 @@ references:
         environment:
           KUBE_ENV_STAGING_NAMESPACE: hmpps-complexity-of-need-staging
           KUBE_ENV_STAGING_NAME: live-1.cloud-platform.service.justice.gov.uk
+          KUBE_ENV_PREPROD_NAMESPACE: hmpps-complexity-of-need-preprod
+          KUBE_ENV_PREPROD_NAME: live-1.cloud-platform.service.justice.gov.uk
+          KUBE_ENV_PRODUCTION_NAMESPACE: hmpps-complexity-of-need-production
+          KUBE_ENV_PRODUCTION_NAME: live-1.cloud-platform.service.justice.gov.uk
 
   test_container_config: &test_container_config
     resource_class: small
@@ -182,13 +186,59 @@ jobs:
       - *configure_gpg
       - *decrypt_secrets
       - deploy:
-          name: Deploy to Staging K8s
+          name: Deploy to staging
           command: |
             kubectl delete job hmpps-complexity-of-need-migration --ignore-not-found
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/migration-job.yaml
             kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/staging
+          environment:
+            <<: *github_team_name_slug
+
+  deploy_preprod:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - run:
+          name: Kubectl deployment preproduction setup
+          command: |
+            setup-kube-auth
+            kubectl config use-context preprod
+      - *install_gpg
+      - *configure_gpg
+      - *decrypt_secrets
+      - deploy:
+          name: Deploy to pre-production
+          command: |
+            kubectl delete job rails-db-migration --ignore-not-found
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/migration-job.yaml
+            kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy/preprod
+          environment:
+            <<: *github_team_name_slug
+
+  deploy_production:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - run:
+          name: Kubectl deployment production setup
+          command: |
+            setup-kube-auth
+            kubectl config use-context production
+      - *install_gpg
+      - *configure_gpg
+      - *decrypt_secrets
+      - deploy:
+          name: Deploy to production
+          command: |
+            kubectl delete job rails-db-migration --ignore-not-found
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/migration-job.yaml
+            kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy/production
           environment:
             <<: *github_team_name_slug
 
@@ -209,7 +259,7 @@ workflows:
             branches:
               only:
                 - main
-                - mo484-sns-sqs-spike
+                - preproduction
       - deploy_staging:
           requires:
             - build_and_push_docker_image
@@ -217,4 +267,22 @@ workflows:
             branches:
               only:
                 - main
-                - mo484-sns-sqs-spike
+      - deploy_production_approval:
+          type: approval
+          requires:
+            - deploy_staging
+          filters:
+            branches:
+              only: main
+      - deploy_production:
+          requires:
+            - deploy_production_approval
+          filters:
+            branches:
+              only: main
+      - deploy_preprod:
+          requires:
+            - build_and_push_docker_image
+          filters:
+            branches:
+              only: preproduction
