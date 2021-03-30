@@ -105,6 +105,9 @@ jobs:
     <<: *defaults
     <<: *test_container_config
     steps:
+      - run:
+          name: Install CMake (required by Undercover gem)
+          command: sudo apt update && sudo apt install cmake
       - checkout
       - restore_cache:
           keys:
@@ -150,10 +153,13 @@ jobs:
           name: Security analysis
           command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - run:
-          name: Run Actual Tests
+          name: Run RSpec tests
           command: bundle exec rake spec
       - run:
-          name: Run Swagger
+          name: Check code coverage
+          command: bundle exec undercover --compare origin/main
+      - run:
+          name: Generate Swagger file
           command: bundle exec rake rswag:specs:swaggerize
       - persist_to_workspace:
           root: .
