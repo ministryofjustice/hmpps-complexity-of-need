@@ -154,7 +154,11 @@ jobs:
           command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - run:
           name: Run RSpec tests
-          command: bundle exec rake spec
+          command: bundle exec rspec --format progress --format RspecJunitFormatter --out ~/rspec/rspec.xml
+      - store_test_results:
+          path: ~/rspec
+      - store_artifacts:
+          path: coverage
       - run:
           name: Check code coverage
           command: bundle exec undercover --compare origin/main

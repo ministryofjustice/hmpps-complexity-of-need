@@ -50,6 +50,7 @@ group :development do
 end
 
 group :test do
+  gem "rspec_junit_formatter"
   gem "shoulda-matchers"
   gem "simplecov", require: false
   gem "simplecov-lcov", require: false
