@@ -1,0 +1,2 @@
+# By default, compare against the local `main` branch
+--compare main

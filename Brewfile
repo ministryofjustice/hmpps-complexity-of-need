@@ -11,3 +11,6 @@ brew 'postgres'
 
 # required by gem 'mimemagic' v0.3.9
 brew 'shared-mime-info'
+
+# required by gem 'undercover'
+brew 'cmake'
