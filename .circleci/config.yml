@@ -71,6 +71,16 @@ references:
         sudo apt-get --assume-yes install python3-pip
         sudo pip3 install awscli
 
+  install_yq: &install_yq
+    run:
+      name: Install yq (YAML parser)
+      command: |
+        wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - |\
+        tar xz && mv ${BINARY} /usr/bin/yq
+      environment:
+        VERSION: v4.6.3
+        BINARY: yq_linux_amd64
+
   build_docker_image: &build_docker_image
     run:
       name: Build docker image
@@ -195,7 +205,8 @@ jobs:
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
-      - deploy:
+      - *install_yq
+      - run:
           name: Deploy to staging
           command: |
             kubectl delete job hmpps-complexity-of-need-migration --ignore-not-found
@@ -205,6 +216,9 @@ jobs:
             kubectl apply --record=false -f ./deploy/staging
           environment:
             <<: *github_team_name_slug
+      - run:
+          name: Wait for Kube to spin up new pods
+          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_STAGING_NAMESPACE" "hmpps-complexity-of-need" "$CIRCLE_SHA1"
 
   deploy_preprod:
     <<: *deploy_container_config
@@ -218,7 +232,8 @@ jobs:
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
-      - deploy:
+      - *install_yq
+      - run:
           name: Deploy to pre-production
           command: |
             kubectl delete job rails-db-migration --ignore-not-found
@@ -228,6 +243,9 @@ jobs:
             kubectl apply --record=false -f ./deploy/preprod
           environment:
             <<: *github_team_name_slug
+      - run:
+          name: Wait for Kube to spin up new pods
+          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_PREPROD_NAMESPACE" "hmpps-complexity-of-need" "$CIRCLE_SHA1"
 
   deploy_production:
     <<: *deploy_container_config
@@ -241,7 +259,8 @@ jobs:
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
-      - deploy:
+      - *install_yq
+      - run:
           name: Deploy to production
           command: |
             kubectl delete job rails-db-migration --ignore-not-found
@@ -251,6 +270,9 @@ jobs:
             kubectl apply --record=false -f ./deploy/production
           environment:
             <<: *github_team_name_slug
+      - run:
+          name: Wait for Kube to spin up new pods
+          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_PRODUCTION_NAMESPACE" "hmpps-complexity-of-need" "$CIRCLE_SHA1"
 
 workflows:
   build_and_test:
