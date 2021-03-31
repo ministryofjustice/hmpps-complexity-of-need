@@ -4,6 +4,6 @@ class HealthController < ApplicationController
   skip_before_action :authorise_read!
 
   def index
-    render plain: "Everything is fine."
+    render plain: "pong"
   end
 end

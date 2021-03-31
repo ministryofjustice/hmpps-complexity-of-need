@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   mount Rswag::Ui::Engine => "/api-docs"
   mount Rswag::Api::Engine => "/api-docs"
 
-  get "/health" => "health#index"
+  get "/ping" => "health#index"
   get "/release" => "health#release"
 
   # Default the request format to JSON – avoids need for .json file extension on paths
