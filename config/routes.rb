@@ -7,7 +7,6 @@ Rails.application.routes.draw do
 
   get "/ping" => "health#index"
   get "/health" => "health#index"
-  get "/release" => "health#release"
 
   # Default the request format to JSON – avoids need for .json file extension on paths
   defaults format: :json do
