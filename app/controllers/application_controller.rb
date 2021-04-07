@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
-  # The HMPPS Auth role required for 'write' endpoints
-  WRITE_ROLE = "ROLE_COMPLEXITY_OF_NEED"
+  READ_ROLE = "ROLE_COMPLEXITY_OF_NEED"
+  WRITE_ROLE = "ROLE_UPDATE_COMPLEXITY_OF_NEED"
 
   before_action :authorise_read!
 
@@ -11,18 +11,19 @@ class ApplicationController < ActionController::API
 private
 
   def authorise_read!
-    if token.nil?
-      render_bad_token
-    elsif token.has_scope?("read") == false
-      render_forbidden "You need the scope 'read' to use this endpoint"
-    end
+    authorise_for!(READ_ROLE)
   end
 
   def authorise_write!
+    authorise_for!(WRITE_ROLE)
+  end
+
+  # ignore scopes - they don't make sense as they are client-wide not role-wide
+  def authorise_for!(role)
     if token.nil?
       render_bad_token
-    elsif (token.has_scope?("write") && token.has_role?(WRITE_ROLE)) == false
-      render_forbidden "You need the role '#{WRITE_ROLE}' with scope 'write' to use this endpoint"
+    elsif !token.has_role?(role)
+      render_forbidden "You need the role '#{role}' to use this endpoint"
     end
   end
 

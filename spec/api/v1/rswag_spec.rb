@@ -57,7 +57,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
 
     post "Update the Complexity of Need level for an offender" do
       tags "Single Offender"
-      description "Clients calling this endpoint must have role: `ROLE_COMPLEXITY_OF_NEED` with scope: `write`"
+      description "Clients calling this endpoint must have role: `ROLE_UPDATE_COMPLEXITY_OF_NEED`"
 
       parameter name: :body, in: :body, schema: { "$ref" => "#/components/schemas/NewComplexityOfNeed" }
 

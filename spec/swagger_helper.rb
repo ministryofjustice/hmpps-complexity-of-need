@@ -28,15 +28,15 @@ RSpec.configure do |config|
 
           This API is secured by OAuth 2 with tokens supplied by HMPPS Auth.
 
-          Read permissions are granted to any authorised client. No particular role is required.
+          Read permissions are granted to clients with the role `ROLE_COMPLEXITY_OF_NEED`
 
-          Write permissions are granted to clients with the role `ROLE_COMPLEXITY_OF_NEED` and a `write` scope.
+          Write permissions are granted to clients with the role `ROLE_UPDATE_COMPLEXITY_OF_NEED`.
 
           ---
 
           Owned by the **Manage POM Cases** team
 
-          - Slack: [#ask_moic_pvb](https://mojdt.slack.com/channels/ask_moic_pvb)
+          - Slack: [#manage-pom-cases](https://mojdt.slack.com/channels/manage-pom-cases)
           - GitHub: [ministryofjustice/hmpps-complexity-of-need](https://github.com/ministryofjustice/hmpps-complexity-of-need)
         DESC
       },

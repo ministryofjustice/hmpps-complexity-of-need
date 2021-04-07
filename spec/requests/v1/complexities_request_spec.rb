@@ -114,7 +114,7 @@ RSpec.describe "Complexities", type: :request do
         get endpoint, headers: request_headers
       end
 
-      include_examples "HTTP 403 Forbidden", "You need the scope 'read' to use this endpoint"
+      include_examples "HTTP 403 Forbidden", "You need the role 'ROLE_COMPLEXITY_OF_NEED' to use this endpoint"
     end
 
     context "when the client is unauthenticated" do
@@ -236,24 +236,14 @@ RSpec.describe "Complexities", type: :request do
       end
     end
 
-    context "without role ROLE_COMPLEXITY_OF_NEED" do
+    context "without role ROLE_UPDATE_COMPLEXITY_OF_NEED" do
       before do
-        stub_access_token scopes: %w[read write], roles: %w[SOME_OTHER_ROLE]
+        stub_access_token scopes: %w[read write], roles: %w[ROLE_COMPLEXITY_OF_NEED]
         post endpoint, headers: request_headers
       end
 
       include_examples "HTTP 403 Forbidden",
-                       "You need the role 'ROLE_COMPLEXITY_OF_NEED' with scope 'write' to use this endpoint"
-    end
-
-    context "without write scope" do
-      before do
-        stub_access_token scopes: %w[read], roles: %w[ROLE_COMPLEXITY_OF_NEED]
-        post endpoint, headers: request_headers
-      end
-
-      include_examples "HTTP 403 Forbidden",
-                       "You need the role 'ROLE_COMPLEXITY_OF_NEED' with scope 'write' to use this endpoint"
+                       "You need the role 'ROLE_UPDATE_COMPLEXITY_OF_NEED' to use this endpoint"
     end
 
     context "when the client is unauthenticated" do
@@ -380,7 +370,7 @@ RSpec.describe "Complexities", type: :request do
         post endpoint, headers: request_headers
       end
 
-      include_examples "HTTP 403 Forbidden", "You need the scope 'read' to use this endpoint"
+      include_examples "HTTP 403 Forbidden", "You need the role 'ROLE_COMPLEXITY_OF_NEED' to use this endpoint"
     end
 
     context "when the client is unauthenticated" do
@@ -478,7 +468,7 @@ RSpec.describe "Complexities", type: :request do
         get endpoint, headers: request_headers
       end
 
-      include_examples "HTTP 403 Forbidden", "You need the scope 'read' to use this endpoint"
+      include_examples "HTTP 403 Forbidden", "You need the role 'ROLE_COMPLEXITY_OF_NEED' to use this endpoint"
     end
 
     context "when the client is unauthenticated" do
