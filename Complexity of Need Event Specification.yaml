@@ -1,0 +1,42 @@
+asyncapi: 2.0.0
+info:
+  title: Complexity of Need Microservice
+  version: '1'
+  description: Events posted by the "Complexity of Need" microservice
+  contact:
+    name: Manage POM Cases team
+    email: elephants@digital.justice.gov.uk
+
+channels:
+  hmpps-domain-events-topic:
+    description: Default Notification Channel for HMPSS domain events
+    publish:
+      message:
+        $ref: '#/components/messages/complexity-of-need.level.changed'
+      bindings:
+        sns:
+          is: notification service
+
+components:
+  messages:
+    complexity-of-need.level.changed:
+      payload:
+        type: object
+        properties:
+          offenderNo:
+            type: string
+            description: NOMIS Offender Number
+          level:
+            $ref: '#/components/schemas/Level'
+            description: complexity-of-need-level
+        example: {offenderNo: A123456BC, level: medium}
+
+  schemas:
+    Level:
+      type: string
+      description: Complexity of Need Level
+      enum:
+        - low
+        - medium
+        - high
+      
