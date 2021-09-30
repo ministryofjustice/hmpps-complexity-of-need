@@ -8,3 +8,4 @@ data:
   SENTRY_CURRENT_ENV: "production"
   COMPLEXITY_OF_NEED_HOST: "https://complexity-of-need.hmpps.service.justice.gov.uk"
   NOMIS_OAUTH_HOST: "https://sign-in.hmpps.service.justice.gov.uk"
+  LD_PRELOAD: "/usr/lib/x86_64-linux-gnu/libjemalloc.so"

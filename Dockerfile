@@ -1,4 +1,4 @@
-FROM ruby:2.6.5-stretch
+FROM ruby:2.6.8-slim-bullseye
 
 RUN \
   set -ex \
@@ -9,7 +9,8 @@ RUN \
     locales \
   && sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen \
   && dpkg-reconfigure --frontend=noninteractive locales \
-  && update-locale LANG=en_GB.UTF-8
+  && update-locale LANG=en_GB.UTF-8 \
+  && apt-get clean
 
 ENV \
   LANG=en_GB.UTF-8 \
@@ -30,19 +31,18 @@ WORKDIR /app
 
 RUN \
   set -ex \
-  && apt-get install \
+  && apt-get update && apt-get install \
     -y \
     --no-install-recommends \
-    apt-transport-https \
+    curl \
     build-essential \
     libpq-dev \
-    netcat \
-    nodejs \
     libjemalloc-dev \
   && timedatectl set-timezone Europe/London || true \
-  && gem update bundler --no-document
+  && gem update bundler --no-document \
+  && apt-get clean
 
-COPY Gemfile Gemfile.lock package.json ./
+COPY Gemfile Gemfile.lock ./
 
 RUN bundle install --without development test --jobs 2 --retry 3
 

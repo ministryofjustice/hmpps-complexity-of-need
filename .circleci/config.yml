@@ -22,7 +22,7 @@ references:
   test_container_config: &test_container_config
     resource_class: small
     docker:
-      - image: circleci/ruby:2.6.5-node-browsers
+      - image: cimg/ruby:2.6.8
         environment:
           RAILS_ENV: test
           PGHOST: 127.0.0.1

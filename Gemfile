@@ -3,6 +3,8 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
+ruby "2.6.8"
+
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", ">= 1.4.4", require: false
 gem "faraday"
@@ -17,7 +19,7 @@ gem "pg", "~> 1.1"
 gem "puma", "~> 5.3"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
-gem "rails", "~> 6.1.2", ">= 6.1.2.1"
+gem "rails", "~> 6.1", "< 6.2"
 gem "responders"
 gem "rswag-api"
 gem "rswag-ui"
