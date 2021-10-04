@@ -8,8 +8,9 @@ class Complexity < ApplicationRecord
 
   validates :offender_no, presence: true
   validates :level, inclusion: {
-    in: VALID_LEVELS, allow_nil: false,
-    message: "Must be low, medium or high"
+    in: VALID_LEVELS,
+    allow_nil: false,
+    message: "Must be low, medium or high",
   }
 
   # Get the latest/current Complexity for the given offenders

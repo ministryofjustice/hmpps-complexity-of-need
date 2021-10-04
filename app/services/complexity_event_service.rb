@@ -2,14 +2,14 @@
 
 class ComplexityEventService
   class << self
-    def send_complexity complexity
+    def send_complexity(complexity)
       sns_topic.publish(
         message: {
           offenderNo: complexity.offender_no,
           level: complexity.level,
         }.to_json,
         message_attributes: {
-          eventType:  {
+          eventType: {
             string_value: "complexity-of-need.level.changed",
             data_type: "String",
           },
@@ -26,7 +26,7 @@ class ComplexityEventService
             data_type: "String",
           },
         },
-        )
+      )
     end
 
   private

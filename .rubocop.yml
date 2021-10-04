@@ -23,6 +23,9 @@ AllCops:
 RSpec/NamedSubject:
   Enabled: false
 
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
 RSpec/MultipleExpectations:
   Max: 2
 

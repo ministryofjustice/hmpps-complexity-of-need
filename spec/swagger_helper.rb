@@ -48,9 +48,9 @@ RSpec.configure do |config|
         securitySchemes: {
           HmppsAuth: {
             type: :oauth2,
-              # HMPPS Auth uses the 'client credentials' oAuth 2 flow: https://swagger.io/docs/specification/authentication/oauth2/
-              flows: {
-                clientCredentials: {
+            # HMPPS Auth uses the 'client credentials' oAuth 2 flow: https://swagger.io/docs/specification/authentication/oauth2/
+            flows: {
+              clientCredentials: {
                 scopes: {
                   read: "Grants read access",
                   write: "Grants write access",

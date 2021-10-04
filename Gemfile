@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "2.6.8"
+ruby "3.0.2"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", ">= 1.4.4", require: false
@@ -41,7 +41,7 @@ group :development, :test do
   gem "rspec-rails"
   gem "rswag-specs"
   gem "rubocop"
-  gem "rubocop-govuk", "~> 2.0"
+  gem "rubocop-govuk"
   gem "rubocop-performance"
   gem "rubocop-rails"
   gem "rubocop-rspec"

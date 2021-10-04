@@ -4,30 +4,30 @@ require "rails_helper"
 
 RSpec.describe Complexity, type: :model do
   let(:complexity) { build(:complexity) }
-  let(:event_type) {
+  let(:event_type) do
     {
-    string_value: "complexity-of-need.level.changed",
-    data_type: "String",
-  }
-  }
-  let(:message) {
+      string_value: "complexity-of-need.level.changed",
+      data_type: "String",
+    }
+  end
+  let(:message) do
     {
       offenderNo: complexity.offender_no,
       level: complexity.level,
     }.to_json
-  }
-  let(:version) {
+  end
+  let(:version) do
     {
       string_value: "1",
       data_type: "Number",
     }
-  }
-  let(:url) {
+  end
+  let(:url) do
     {
       string_value: Rails.application.routes.url_helpers.complexity_of_need_single_url(complexity.offender_no),
       data_type: "String",
     }
-  }
+  end
   let(:topic) { instance_double("topic", publish: nil) }
 
   before do
@@ -39,7 +39,7 @@ RSpec.describe Complexity, type: :model do
     expect(topic).to have_received(:publish).with(
       message: message,
       message_attributes: hash_including(eventType: event_type, version: version, detailURL: url),
-      )
+    )
   end
 
   describe "VALID_LEVELS" do

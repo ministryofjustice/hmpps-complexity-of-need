@@ -29,12 +29,12 @@ private
 
   def token
     @token ||= begin
-                 auth_header = request.headers["Authorization"]
-                 if auth_header.present? && auth_header.starts_with?("Bearer")
-                   access_token = auth_header.split.last
-                   HmppsApi::Oauth::Token.new(access_token)
-                 end
-               end
+      auth_header = request.headers["Authorization"]
+      if auth_header.present? && auth_header.starts_with?("Bearer")
+        access_token = auth_header.split.last
+        HmppsApi::Oauth::Token.new(access_token)
+      end
+    end
   end
 
   def render_bad_token

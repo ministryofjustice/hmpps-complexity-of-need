@@ -24,10 +24,10 @@ end
 
 RSpec.describe "Complexities", type: :request do
   let(:response_json) { JSON.parse(response.body) }
-  let(:request_headers) {
+  let(:request_headers) do
     # Include an Authorization header to make the request valid
     { "Authorization" => auth_header }
-  }
+  end
   let(:topic) { instance_double("topic", publish: nil) }
 
   before do
@@ -143,11 +143,11 @@ RSpec.describe "Complexities", type: :request do
     let(:source_system) { Rails.configuration.nomis_oauth_client_id }
 
     context "with only mandatory fields" do
-      let(:post_body) {
+      let(:post_body) do
         {
           level: "high",
         }
-      }
+      end
 
       before do
         post endpoint, params: post_body, as: :json, headers: request_headers
@@ -165,13 +165,13 @@ RSpec.describe "Complexities", type: :request do
     end
 
     context "with optional fields included" do
-      let(:post_body) {
+      let(:post_body) do
         {
           level: "high",
           sourceUser: "SOME_NOMIS_USER",
           notes: "Some free-text notes supplied by the user",
         }
-      }
+      end
 
       before do
         post endpoint, params: post_body, as: :json, headers: request_headers
@@ -191,13 +191,13 @@ RSpec.describe "Complexities", type: :request do
     end
 
     context "with mandatory fields missing" do
-      let(:post_body) {
+      let(:post_body) do
         {
           # "level" is missing
           sourceUser: "SOME_NOMIS_USER",
           notes: "Some free-text notes supplied by the user",
         }
-      }
+      end
 
       before do
         post endpoint, params: post_body, as: :json, headers: request_headers
@@ -215,11 +215,11 @@ RSpec.describe "Complexities", type: :request do
     end
 
     context "with an invalid complexity level" do
-      let(:post_body) {
+      let(:post_body) do
         {
           level: "something invalid",
         }
-      }
+      end
 
       before do
         post endpoint, params: post_body, as: :json, headers: request_headers
@@ -299,7 +299,7 @@ RSpec.describe "Complexities", type: :request do
       let(:offender_with_one_level) { "Offender2" }
       let(:offender_without_levels) { "Offender3" }
 
-      let(:expected_response) {
+      let(:expected_response) do
         [offender_with_one_level, offender_with_multiple_levels].map do |offender|
           # Find the most recent Complexity for this offender
           most_recent = Complexity.order(created_at: :desc).where(offender_no: offender).first
@@ -312,7 +312,7 @@ RSpec.describe "Complexities", type: :request do
             createdTimeStamp: most_recent.created_at,
           }.compact # Remove nil values – sourceUser and notes are optional
         end
-      }
+      end
 
       let(:post_body) { [offender_with_one_level, offender_with_multiple_levels, offender_without_levels] }
 
@@ -337,7 +337,7 @@ RSpec.describe "Complexities", type: :request do
       # Generate 1000 offender numbers
       let(:offenders) { (1..1000).map { |n| "Offender#{n}" } }
 
-      let(:expected_response) {
+      let(:expected_response) do
         offenders.map do |offender|
           # Find the most recent Complexity for this offender
           most_recent = Complexity.order(created_at: :desc).where(offender_no: offender).first
@@ -348,13 +348,13 @@ RSpec.describe "Complexities", type: :request do
             createdTimeStamp: most_recent.created_at,
           }
         end
-      }
+      end
 
       before do
         # Generate a Complexity for each offender
-        offenders.each { |offender|
+        offenders.each do |offender|
           create(:complexity, :random_date, offender_no: offender)
-        }
+        end
 
         post endpoint, params: offenders, as: :json, headers: request_headers
       end
