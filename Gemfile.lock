@@ -146,7 +146,7 @@ GEM
       ast (~> 2.4.1)
     pg (1.2.3)
     public_suffix (4.0.6)
-    puma (5.5.0)
+    puma (5.5.1)
       nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
@@ -299,7 +299,7 @@ DEPENDENCIES
   jbuilder (~> 2.7)
   jwt
   pg (~> 1.1)
-  puma (~> 5.3)
+  puma (~> 5.5)
   rails (~> 6.1, < 6.2)
   responders
   rspec-rails
