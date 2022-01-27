@@ -5,8 +5,8 @@ metadata:
   annotations:
     # Only allow incoming traffic from: other apps running in the MOJ Cloud Platform, and the MOJ Digital VPN
     nginx.ingress.kubernetes.io/whitelist-source-range: "35.178.209.113/32,3.8.51.207/32,35.177.252.54/32,81.134.202.29/32"
-    external-dns.alpha.kubernetes.io/set-identifier: hmpps-complexity-of-need-preprod-blue
-    external-dns.alpha.kubernetes.io/aws-weight: "100"
+    external-dns.alpha.kubernetes.io/set-identifier: hmpps-complexity-of-need-preprod-green
+    external-dns.alpha.kubernetes.io/aws-weight: "0"
 spec:
   tls:
   - hosts:
