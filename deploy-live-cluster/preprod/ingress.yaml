@@ -10,12 +10,12 @@ metadata:
 spec:
   tls:
   - hosts:
-    - hmpps-complexity-of-need-preprod.apps.live-1.cloud-platform.service.justice.gov.uk
+    - hmpps-complexity-of-need-preprod.apps.live.cloud-platform.service.justice.gov.uk
   - hosts:
     - complexity-of-need-preprod.hmpps.service.justice.gov.uk
     secretName: preprod-cert
   rules:
-  - host: hmpps-complexity-of-need-preprod.apps.live-1.cloud-platform.service.justice.gov.uk
+  - host: hmpps-complexity-of-need-preprod.apps.live.cloud-platform.service.justice.gov.uk
     http:
       paths:
       - path: /
