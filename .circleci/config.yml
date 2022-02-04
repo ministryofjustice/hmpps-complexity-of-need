@@ -13,11 +13,8 @@ references:
       - image: ministryofjustice/cloud-platform-tools
         environment:
           KUBE_ENV_STAGING_NAMESPACE: hmpps-complexity-of-need-staging
-          KUBE_ENV_STAGING_NAME: live-1.cloud-platform.service.justice.gov.uk
           KUBE_ENV_PREPROD_NAMESPACE: hmpps-complexity-of-need-preprod
-          KUBE_ENV_PREPROD_NAME: live-1.cloud-platform.service.justice.gov.uk
           KUBE_ENV_PRODUCTION_NAMESPACE: hmpps-complexity-of-need-production
-          KUBE_ENV_PRODUCTION_NAME: live-1.cloud-platform.service.justice.gov.uk
 
   test_container_config: &test_container_config
     resource_class: small
@@ -225,6 +222,38 @@ jobs:
           name: Wait for Kube to spin up new pods
           command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_STAGING_NAMESPACE" "hmpps-complexity-of-need" "$CIRCLE_SHA1"
 
+  deploy_staging_live:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - run:
+          name: Kubectl deployment staging setup
+          command: |
+            echo -n ${CLUSTER_CERT_STAGING} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
+            kubectl config set-credentials circleci --token=${TOKEN_STAGING_LIVE}
+            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_STAGING_NAMESPACE}
+            kubectl config use-context ${CLUSTER_NAME_LIVE}
+            kubectl config current-context
+            kubectl --namespace=${KUBE_ENV_STAGING_NAMESPACE} get pods
+      - *install_gpg
+      - *configure_gpg
+      - *decrypt_secrets
+      - *install_yq
+      - run:
+          name: Deploy to staging
+          command: |
+            kubectl delete job hmpps-complexity-of-need-migration --ignore-not-found
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy-live-cluster/staging/deployment.yaml
+            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy-live-cluster/staging/migration-job.yaml
+            kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
+            kubectl apply --record=false -f ./deploy-live-cluster/staging
+          environment:
+            <<: *github_team_name_slug
+      - run:
+          name: Wait for Kube to spin up new pods
+          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_STAGING_NAMESPACE" "hmpps-complexity-of-need" "$CIRCLE_SHA1"
+
   deploy_preprod:
     <<: *deploy_container_config
     steps:
@@ -314,10 +343,18 @@ workflows:
             branches:
               only:
                 - main
+      - deploy_staging_live:
+          requires:
+            - build_and_push_docker_image
+          filters:
+            branches:
+              only:
+                - main
       - deploy_production_approval:
           type: approval
           requires:
             - deploy_staging
+            - deploy_staging_live
           filters:
             branches:
               only: main
