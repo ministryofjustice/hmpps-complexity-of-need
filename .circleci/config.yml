@@ -10,14 +10,11 @@ references:
   deploy_container_config: &deploy_container_config
     resource_class: small
     docker:
-      - image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/cloud-platform/tools:circleci
+      - image: ministryofjustice/cloud-platform-tools
         environment:
           KUBE_ENV_STAGING_NAMESPACE: hmpps-complexity-of-need-staging
-          KUBE_ENV_STAGING_NAME: live-1.cloud-platform.service.justice.gov.uk
           KUBE_ENV_PREPROD_NAMESPACE: hmpps-complexity-of-need-preprod
-          KUBE_ENV_PREPROD_NAME: live-1.cloud-platform.service.justice.gov.uk
           KUBE_ENV_PRODUCTION_NAMESPACE: hmpps-complexity-of-need-production
-          KUBE_ENV_PRODUCTION_NAME: live-1.cloud-platform.service.justice.gov.uk
 
   test_container_config: &test_container_config
     resource_class: small
@@ -198,10 +195,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Kubectl deployment staging setup
+          name: Kubectl deployment to live cluster staging setup
           command: |
-            setup-kube-auth
-            kubectl config use-context staging
+            echo -n ${CLUSTER_LIVE_CERT} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
+            kubectl config set-credentials circleci --token=${LIVE_STAGING_TOKEN}
+            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_STAGING_NAMESPACE}
+            kubectl config use-context ${CLUSTER_NAME_LIVE}
+            kubectl config current-context
+            kubectl --namespace=${KUBE_ENV_STAGING_NAMESPACE} get pods
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
@@ -214,6 +216,8 @@ jobs:
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/migration-job.yaml
             kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/staging
+            kubectl apply --record=false -f ./deploy/staging/ingress/ingress.yaml
+            kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
       - run:
@@ -227,8 +231,13 @@ jobs:
       - run:
           name: Kubectl deployment preproduction setup
           command: |
-            setup-kube-auth
-            kubectl config use-context preprod
+            echo -n ${CLUSTER_LIVE_CERT} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
+            kubectl config set-credentials circleci --token=${LIVE_PREPROD_TOKEN}
+            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_PREPROD_NAMESPACE}
+            kubectl config use-context ${CLUSTER_NAME_LIVE}
+            kubectl config current-context
+            kubectl --namespace=${KUBE_ENV_PREPROD_NAMESPACE} get pods
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
@@ -239,8 +248,9 @@ jobs:
             kubectl delete job rails-db-migration --ignore-not-found
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/migration-job.yaml
-            kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/preprod
+            kubectl apply --record=false -f ./deploy/preprod/ingress/ingress.yaml
+            kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
       - run:
@@ -254,8 +264,13 @@ jobs:
       - run:
           name: Kubectl deployment production setup
           command: |
-            setup-kube-auth
-            kubectl config use-context production
+            echo -n ${CLUSTER_LIVE_CERT} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
+            kubectl config set-credentials circleci --token=${LIVE_PRODUCTION_TOKEN}
+            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE}
+            kubectl config use-context ${CLUSTER_NAME_LIVE}
+            kubectl config current-context
+            kubectl --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE} get pods
       - *install_gpg
       - *configure_gpg
       - *decrypt_secrets
@@ -266,8 +281,9 @@ jobs:
             kubectl delete job rails-db-migration --ignore-not-found
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/migration-job.yaml
-            kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
             kubectl apply --record=false -f ./deploy/production
+            kubectl apply --record=false -f ./deploy/production/ingress/ingress.yaml
+            kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
       - run:

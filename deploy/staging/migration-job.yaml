@@ -5,6 +5,7 @@ metadata:
   labels:
     app: hmpps-complexity-of-need-migration
 spec:
+  ttlSecondsAfterFinished: 3600
   completions: 1
   parallelism: 1
   template:
