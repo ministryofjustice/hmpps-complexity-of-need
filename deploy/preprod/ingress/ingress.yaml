@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: app-ingress
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: hmpps-complexity-of-need-staging-green
+    external-dns.alpha.kubernetes.io/set-identifier: app-ingress-hmpps-complexity-of-need-preprod-green
     external-dns.alpha.kubernetes.io/aws-weight: "100"
     # Only allow incoming traffic from: other apps running in the MOJ Cloud Platform, and the MOJ Digital VPN
     nginx.ingress.kubernetes.io/whitelist-source-range: "35.178.209.113/32,3.8.51.207/32,35.177.252.54/32,81.134.202.29/32"

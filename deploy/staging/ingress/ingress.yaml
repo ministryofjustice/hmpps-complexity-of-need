@@ -4,7 +4,7 @@ metadata:
   name: hmpps-complexity-of-need
   namespace: hmpps-complexity-of-need-staging
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: hmpps-complexity-of-need-staging-green
+    external-dns.alpha.kubernetes.io/set-identifier: hmpps-complexity-of-need-hmpps-complexity-of-need-staging-green
     external-dns.alpha.kubernetes.io/aws-weight: "100"
     kubernetes.io/ingress.class: "nginx"
 spec:
