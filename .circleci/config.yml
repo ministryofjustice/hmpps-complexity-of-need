@@ -215,7 +215,6 @@ jobs:
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/migration-job.yaml
             kubectl apply --record=false -f ./deploy/staging
-            kubectl apply --record=false -f ./deploy/staging/ingress/ingress.yaml
             kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
@@ -248,7 +247,6 @@ jobs:
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/migration-job.yaml
             kubectl apply --record=false -f ./deploy/preprod
-            kubectl apply --record=false -f ./deploy/preprod/ingress/ingress.yaml
             kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
@@ -281,7 +279,6 @@ jobs:
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
             sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/migration-job.yaml
             kubectl apply --record=false -f ./deploy/production
-            kubectl apply --record=false -f ./deploy/production/ingress/ingress.yaml
             kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
