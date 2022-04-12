@@ -31,3 +31,5 @@ Brewfile.lock.json
 
 # Ignore Simplecov coverage reports
 /coverage
+
+.DS_Store
