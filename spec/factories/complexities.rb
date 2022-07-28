@@ -5,6 +5,7 @@ FactoryBot.define do
     offender_no { "1234567" }
     level { Complexity::VALID_LEVELS.sample }
     source_system { "omic-mpc-something" }
+    active { true }
 
     # Complexity records are never edited, so updated_at should always equal created_at
     updated_at { created_at }
@@ -20,6 +21,10 @@ FactoryBot.define do
     # Set created_at to a random date in the past
     trait :random_date do
       created_at { Kernel.rand(1.year.ago..1.minute.ago) }
+    end
+
+    trait :inactive do
+      active { false }
     end
   end
 end
