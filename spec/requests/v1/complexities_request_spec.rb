@@ -24,21 +24,32 @@ end
 
 RSpec.describe "Complexities", type: :request do
   let(:response_json) { JSON.parse(response.body) }
+  # let(:request_headers) do
+  #   # Include an Authorization header to make the request valid
+  #   { "Authorization" => auth_header }
+  # end
   let(:request_headers) do
-    # Include an Authorization header to make the request valid
-    { "Authorization" => auth_header }
+    { "Authorization" => "Bearer BOBBINS" }
   end
+
   let(:topic) { instance_double("topic", publish: nil) }
+  let(:expired_token) { false }
 
   before do
     allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
+
+    stub_access_token(
+      scopes: %w[read write], 
+      roles: [ApplicationController::READ_ROLE, ApplicationController::WRITE_ROLE],
+      expired_token: expired_token
+    )
   end
 
   describe "GET /v1/complexity-of-need/offender-no/:offender_no" do
     let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}" }
     let(:offender_no) { complexity.offender_no }
     let!(:complexity) { create(:complexity) }
-
+    
     before do
       get endpoint, headers: request_headers
     end
@@ -126,12 +137,7 @@ RSpec.describe "Complexities", type: :request do
     end
 
     context "when the client's token has expired" do
-      before do
-        # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
-          get endpoint, headers: request_headers
-        end
-      end
+      let(:expired_token) { true }
 
       include_examples "HTTP 401 Unauthorized"
     end
@@ -255,12 +261,7 @@ RSpec.describe "Complexities", type: :request do
     end
 
     context "when the client's token has expired" do
-      before do
-        # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
-          post endpoint, headers: request_headers
-        end
-      end
+      let(:expired_token) { true }
 
       include_examples "HTTP 401 Unauthorized"
     end
