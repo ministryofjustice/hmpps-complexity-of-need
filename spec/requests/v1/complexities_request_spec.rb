@@ -24,10 +24,7 @@ end
 
 RSpec.describe "Complexities", type: :request do
   let(:response_json) { JSON.parse(response.body) }
-  # let(:request_headers) do
-  #   # Include an Authorization header to make the request valid
-  #   { "Authorization" => auth_header }
-  # end
+
   let(:request_headers) do
     { "Authorization" => "Bearer BOBBINS" }
   end
@@ -263,6 +260,10 @@ RSpec.describe "Complexities", type: :request do
     context "when the client's token has expired" do
       let(:expired_token) { true }
 
+      before do
+        post endpoint, headers: request_headers
+      end
+
       include_examples "HTTP 401 Unauthorized"
     end
   end
@@ -383,11 +384,10 @@ RSpec.describe "Complexities", type: :request do
     end
 
     context "when the client's token has expired" do
+      let(:expired_token) { true }
+
       before do
-        # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
-          post endpoint, headers: request_headers
-        end
+        post endpoint, headers: request_headers
       end
 
       include_examples "HTTP 401 Unauthorized"
@@ -483,14 +483,8 @@ RSpec.describe "Complexities", type: :request do
     end
 
     context "when the client's token has expired" do
+      let(:expired_token) { true }
       let(:offender_no) { "1234567" }
-
-      before do
-        # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
-          get endpoint, headers: request_headers
-        end
-      end
 
       include_examples "HTTP 401 Unauthorized"
     end
@@ -498,15 +492,12 @@ RSpec.describe "Complexities", type: :request do
 
   describe "PUT /v1/complexity-of-need/offender-no/:offender_no/inactivate" do
     let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}/inactivate" }
-    let(:offender_no) { "ABC123" }
+    let(:offender_no) { complexity.offender_no }
+    let!(:complexity) { create(:complexity) }
 
     context "when authenticated with correct role" do
-      let(:post_body) do
-        {}
-      end
-
       before do
-        put endpoint, params: post_body, as: :json, headers: request_headers
+        put endpoint, headers: request_headers
       end
 
       it "inactivates the latest record" do
@@ -514,17 +505,17 @@ RSpec.describe "Complexities", type: :request do
         complexity = Complexity.find_by!(offender_no: offender_no)
         expect(response_json)
           .to eq json_object(offenderNo: offender_no,
-                             level: post_body.fetch(:level),
-                             sourceSystem: source_system,
-                             active: false,
+                             level: complexity.level,
+                             sourceSystem: complexity.source_system,
                              createdTimeStamp: complexity.created_at)
+        expect(complexity.active).to eq(false)
       end
     end
 
     context "without role ROLE_UPDATE_COMPLEXITY_OF_NEED" do
       before do
         stub_access_token scopes: %w[read write], roles: %w[ROLE_COMPLEXITY_OF_NEED]
-        post endpoint, headers: request_headers
+        put endpoint, headers: request_headers
       end
 
       include_examples "HTTP 403 Forbidden",
@@ -533,18 +524,17 @@ RSpec.describe "Complexities", type: :request do
 
     context "when the client is unauthenticated" do
       before do
-        post endpoint # don't include an Authorization header
+        put endpoint # don't include an Authorization header
       end
 
       include_examples "HTTP 401 Unauthorized"
     end
 
     context "when the client's token has expired" do
+      let(:expired_token) { true }
+
       before do
-        # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
-          post endpoint, headers: request_headers
-        end
+        put endpoint, headers: request_headers
       end
 
       include_examples "HTTP 401 Unauthorized"

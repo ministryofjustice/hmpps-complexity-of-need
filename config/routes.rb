@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       post "/complexity-of-need/offender-no/:offender_no" => "complexities#create"
       post "/complexity-of-need/multiple/offender-no" => "complexities#multiple"
       get "/complexity-of-need/offender-no/:offender_no/history" => "complexities#history"
+      put "/complexity-of-need/offender-no/:offender_no/inactivate" => "complexities#inactivate"
     end
   end
 end
