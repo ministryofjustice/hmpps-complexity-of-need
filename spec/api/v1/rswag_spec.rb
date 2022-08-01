@@ -178,6 +178,38 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
       end
     end
   end
+
+  path "/complexity-of-need/offender-no/{offender_no}/inactivate" do
+    parameter name: :offender_no, in: :path, type: :string,
+              description: "NOMIS Offender Number", example: "A0000AA"
+
+    let(:offender_no) { "G4273GI" }
+
+    put "Inactivate the Complexity of Need level for an offender" do
+      tags "Single Offender"
+      description "Clients calling this endpoint must have role: `ROLE_UPDATE_COMPLEXITY_OF_NEED`"
+
+      response "200", "Complexity of Need level inactivated successfully" do
+        schema "$ref" => "#/components/schemas/ComplexityOfNeed"
+
+        run_test!
+      end
+
+      response "401", "Invalid or missing access token" do
+        let(:Authorization) { nil } # rubocop:disable RSpec/VariableName
+
+        run_test!
+      end
+
+      response "403", "Access token is missing role `ROLE_COMPLEXITY_OF_NEED` or scope `write`" do
+        before do
+          stub_access_token scopes: %w[read], roles: %w[SOME_OTHER_ROLE]
+        end
+
+        run_test!
+      end
+    end
+  end
 end
 
 # rubocop:enable RSpec/EmptyExampleGroup
