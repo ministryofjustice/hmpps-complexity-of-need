@@ -7,6 +7,7 @@ class ComplexityEventService
         message: {
           offenderNo: complexity.offender_no,
           level: complexity.level,
+          active: complexity.active
         }.to_json,
         message_attributes: {
           eventType: {

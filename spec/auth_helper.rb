@@ -12,8 +12,8 @@ module AuthHelper
   end
 
   # Mock the client's access token with the specified scopes and roles
-  def stub_access_token(scopes: [], roles: [], expired_token: false, source_system: Rails.configuration.nomis_oauth_client_id)
-    if expired_token
+  def stub_access_token(scopes: [], roles: [], is_expired: false, source_system: Rails.configuration.nomis_oauth_client_id)
+    if is_expired
       token = nil
     else
       token = instance_double(HmppsApi::Oauth::Token, access_token: "dummy-access-token")

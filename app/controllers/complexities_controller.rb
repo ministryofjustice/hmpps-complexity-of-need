@@ -11,6 +11,7 @@ class ComplexitiesController < ApplicationController
 
   def show
     @complexity = Complexity.order(created_at: :desc).find_by!(offender_no: params[:offender_no])
+    not_found unless @complexity.active?
   end
 
   def create
@@ -21,7 +22,7 @@ class ComplexitiesController < ApplicationController
   def multiple
     return missing_offender_numbers unless params["_json"].is_a? Array
 
-    @complexities = Complexity.latest_for_offenders(params["_json"])
+    @complexities = Complexity.active.latest_for_offenders(params["_json"])
   end
 
   def history
