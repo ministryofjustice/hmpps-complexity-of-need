@@ -7,7 +7,7 @@ class ComplexitiesController < ApplicationController
 
   # Require write permissions to create new records
   skip_before_action :authorise_read!,  only: [:create]
-  before_action      :authorise_write!, only: [:create, :inactivate]
+  before_action      :authorise_write!, only: %i[create inactivate]
 
   def show
     @complexity = Complexity.order(created_at: :desc).find_by!(offender_no: params[:offender_no])
@@ -32,8 +32,8 @@ class ComplexitiesController < ApplicationController
 
   def inactivate
     @complexity = Complexity.order(created_at: :desc).find_by!(offender_no: params[:offender_no])
-    @complexity.update(active: false)
-    render 'show'
+    @complexity.update!(active: false)
+    render "show"
   end
 
 private

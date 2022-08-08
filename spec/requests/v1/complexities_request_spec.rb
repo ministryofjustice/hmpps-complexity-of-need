@@ -91,7 +91,6 @@ RSpec.describe "Complexities", type: :request do
       let(:most_recent) { Complexity.where(offender_no: offender_no).order(created_at: :desc).first }
       let(:most_recent_active_status) { true }
 
-
       before do
         # Populate database with multiple records for multiple offenders
         [1.month.ago, 1.week.ago, 1.day.ago].each do |date|
@@ -99,7 +98,7 @@ RSpec.describe "Complexities", type: :request do
           create(:complexity, offender_no: different_offender_no, created_at: date, updated_at: date)
         end
 
-        most_recent.update(active: most_recent_active_status)
+        most_recent.update!(active: most_recent_active_status)
 
         get endpoint, headers: request_headers
       end
@@ -113,7 +112,8 @@ RSpec.describe "Complexities", type: :request do
                                active: most_recent.active)
       end
 
-      context 'and with the latest complexity inactive' do
+      # rubocop:disable RSpec/NestedGroups
+      context "with the latest complexity inactive" do
         let(:most_recent_active_status) { false }
         let(:most_recent_active) { Complexity.active.where(offender_no: offender_no).order(created_at: :desc).first }
 
@@ -121,6 +121,7 @@ RSpec.describe "Complexities", type: :request do
           expect(response).to have_http_status :not_found
         end
       end
+      # rubocop:enable RSpec/NestedGroups
     end
 
     context "when the client doesn't have the 'read' scope" do
@@ -327,7 +328,7 @@ RSpec.describe "Complexities", type: :request do
             sourceUser: most_recent.source_user,
             notes: most_recent.notes,
             createdTimeStamp: most_recent.created_at,
-            active: most_recent.active
+            active: most_recent.active,
           }.compact # Remove nil values – sourceUser and notes are optional
         end
       end
@@ -364,7 +365,7 @@ RSpec.describe "Complexities", type: :request do
             level: most_recent.level,
             sourceSystem: most_recent.source_system,
             createdTimeStamp: most_recent.created_at,
-            active: most_recent.active
+            active: most_recent.active,
           }
         end
       end
@@ -482,19 +483,21 @@ RSpec.describe "Complexities", type: :request do
         end
       end
 
-      context 'with some inactivated' do
+      # rubocop:disable RSpec/NestedGroups
+      context "with some inactivated" do
         let(:some_inactive) { true }
 
         it "displays all the records including inactivated" do
           response_json.each_with_index do |json, index|
             expect(json).to eq json_object(level: history[index].level,
-                                          offenderNo: history[index].offender_no,
-                                          createdTimeStamp: history[index].created_at,
-                                          sourceSystem: history[index].source_system,
-                                          active: history[index].active)
+                                           offenderNo: history[index].offender_no,
+                                           createdTimeStamp: history[index].created_at,
+                                           sourceSystem: history[index].source_system,
+                                           active: history[index].active)
           end
         end
       end
+      # rubocop:enable RSpec/NestedGroups
     end
 
     context "when the client doesn't have the 'read' scope" do
@@ -530,7 +533,6 @@ RSpec.describe "Complexities", type: :request do
 
       include_examples "HTTP 401 Unauthorized"
     end
-
   end
 
   describe "PUT /v1/complexity-of-need/offender-no/:offender_no/inactivate" do
@@ -543,8 +545,11 @@ RSpec.describe "Complexities", type: :request do
         put endpoint, headers: request_headers
       end
 
-      it "inactivates the latest record" do
+      it "returns success" do
         expect(response).to have_http_status :ok
+      end
+
+      it "inactivates the latest record" do
         complexity = Complexity.find_by!(offender_no: offender_no)
         expect(response_json)
           .to eq json_object(offenderNo: offender_no,

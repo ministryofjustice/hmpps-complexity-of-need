@@ -99,7 +99,7 @@ RSpec.configure do |config|
               active: {
                 type: :boolean,
                 description: "Whether it is active or not",
-              }
+              },
             },
             required: %w[offenderNo level createdTimeStamp sourceSystem],
             additionalProperties: false,
