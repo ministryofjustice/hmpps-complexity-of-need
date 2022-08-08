@@ -143,40 +143,6 @@ jobs:
           name: Rubocop
           command: bundle exec rubocop
 
-  run_tests:
-    <<: *defaults
-    <<: *test_container_config
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - hmpps-complexity-of-need-{{ checksum "Gemfile.lock" }}
-            - hmpps-complexity-of-need-
-      - run:
-          name: Which bundler?
-          command: bundle -v
-      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
-      - run:
-          name: Security analysis
-          command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
-      - run:
-          name: Run RSpec tests
-          command: bundle exec rspec --format progress --format RspecJunitFormatter --out ~/rspec/rspec.xml
-      - store_test_results:
-          path: ~/rspec
-      - store_artifacts:
-          path: coverage
-      - run:
-          name: Check code coverage
-          command: bundle exec undercover --compare origin/main
-      - run:
-          name: Generate Swagger file
-          command: bundle exec rake rswag:specs:swaggerize
-      - persist_to_workspace:
-          root: .
-          paths:
-            - swagger/v1/swagger.yaml
-
   build_and_push_docker_image:
     <<: *defaults
     <<: *test_container_config
@@ -293,12 +259,9 @@ workflows:
       - rubocop:
           requires:
             - install_dependencies
-      - run_tests:
-          requires:
-            - rubocop
       - build_and_push_docker_image:
           requires:
-            - run_tests
+            - rubocop
           filters:
             branches:
               only:
