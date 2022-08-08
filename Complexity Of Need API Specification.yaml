@@ -192,6 +192,9 @@ components:
           type: string
           format: date-time
           description: The date & time this entry was created
+        active:
+          type: boolean
+          description: Whether the complexity of need is active or not
     Level:
       type: string
       description: Complexity of Need Level

@@ -190,6 +190,10 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
       description "Clients calling this endpoint must have role: `ROLE_UPDATE_COMPLEXITY_OF_NEED`"
 
       response "200", "Complexity of Need level inactivated successfully" do
+        before do
+          create(:complexity, :with_user, offender_no: offender_no)
+        end
+
         schema "$ref" => "#/components/schemas/ComplexityOfNeed"
 
         run_test!

@@ -14,6 +14,7 @@ RSpec.describe Complexity, type: :model do
     {
       offenderNo: complexity.offender_no,
       level: complexity.level,
+      active: true
     }.to_json
   end
   let(:version) do
