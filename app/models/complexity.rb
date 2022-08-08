@@ -17,9 +17,9 @@ class Complexity < ApplicationRecord
 
   # Get the latest/current Complexity for the given offenders
   def self.latest_for_offenders(offender_nos)
-    self.active
-        .select("DISTINCT ON (offender_no) *")
-        .order(:offender_no, created_at: :desc)
-        .where(offender_no: offender_nos)
+    active
+      .select("DISTINCT ON (offender_no) *")
+      .order(:offender_no, created_at: :desc)
+      .where(offender_no: offender_nos)
   end
 end
