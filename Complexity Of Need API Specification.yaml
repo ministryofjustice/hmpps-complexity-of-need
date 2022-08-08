@@ -104,6 +104,34 @@ paths:
         - CL_auth:
             - 'write:CL'
             - 'read:CL'
+  /complexity-of-need/offender-no/{offenderNo}/inactivate:
+    put:
+      tags:
+        - Single Individual Complexity of Need
+      summary: Inactivate Complexity of Needs for the given NOMIS Offender Number
+      description: >-
+        Inactivates latest Complexity of Need entry for the given Offender Number
+      operationId: getCLInactivateForSingleOffenderNumber
+      parameters:
+        - name: offenderNo
+          in: path
+          description: NOMIS Assigned Offender Number (Prisoner Identifier)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplexityOfNeed'
+        '404':
+          $ref: '#/components/responses/404notfound'
+      security:
+        - CL_auth:
+            - 'write:CL'
+            - 'read:CL'
   /complexity-of-need/multiple/offender-no:
     post:
       tags:
