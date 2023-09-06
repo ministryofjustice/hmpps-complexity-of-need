@@ -16,7 +16,7 @@ gem "jwt"
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
 # Use Puma as the app server
-gem "puma", "~> 5.3"
+gem "puma", "~> 5.6"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
 gem "rails", "6.1.5"
