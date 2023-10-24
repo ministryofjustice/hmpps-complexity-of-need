@@ -14,7 +14,7 @@ gem "jbuilder", "~> 2.7"
 gem "jwt"
 
 # Use postgresql as the database for Active Record
-gem "pg", "~> 1.1"
+gem "pg", "~> 1.5"
 # Use Puma as the app server
 gem "puma", "~> 5.6"
 
