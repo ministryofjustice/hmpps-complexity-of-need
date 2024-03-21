@@ -7,7 +7,6 @@ FactoryBot.define do
     source_system { "omic-mpc-something" }
     active { true }
 
-    # Complexity records are never edited, so updated_at should always equal created_at
     updated_at { created_at }
 
     trait :with_user do

@@ -17,9 +17,11 @@ class Complexity < ApplicationRecord
 
   # Get the latest/current Complexity for the given offenders
   def self.latest_for_offenders(offender_nos)
-    active
-      .select("DISTINCT ON (offender_no) *")
-      .order(:offender_no, created_at: :desc)
-      .where(offender_no: offender_nos)
+    offender_nos.map { |n| latest_for_offender(n) }.compact
+  end
+
+  def self.latest_for_offender(offender_no)
+    cnl = where(offender_no: offender_no).order(created_at: :desc).limit(1).first
+    cnl.present? && cnl.active? ? cnl : nil
   end
 end
