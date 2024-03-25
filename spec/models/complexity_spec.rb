@@ -78,43 +78,37 @@ RSpec.describe Complexity, type: :model do
   describe ".latest_for_offenders" do
     subject { described_class.latest_for_offenders(offenders) }
 
-    let(:offenders) { [offender1, offender2, offender3, offender4] }
-
-    let(:offender1) { "A0001BC" }
-    let(:offender2) { "A0002BC" }
-    let(:offender3) { "A0003BC" }
-    let(:offender4) { "A0004BC" }
-    let(:offender5) { "A0005BC" }
+    let(:offenders) { [offender_with_multiple_levels, offender_with_one_level, offender_without_levels] }
+    let(:offender_with_multiple_levels) { "Offender1" }
+    let(:offender_with_one_level) { "Offender2" }
+    let(:offender_without_levels) { "Offender3" }
+    let(:some_other_offender) { "Offender4" } # we don't want get this offender's complexity level
 
     before do
-      # Offender 1 has multiple historical levels, but currently no level
-      create(:complexity, :inactive, offender_no: offender1, created_at: Time.zone.today - 5.days)
-      create(:complexity, :inactive, offender_no: offender1, created_at: Time.zone.today - 4.days)
-      create(:complexity,            offender_no: offender1, created_at: Time.zone.today - 3.days)
-      create(:complexity, :inactive, offender_no: offender1, created_at: Time.zone.today - 2.days)
+      # Create 10 entries for offender_with_multiple_levels
+      create_list(:complexity, 10, :random_date, offender_no: offender_with_multiple_levels)
 
-      # Offender 2 has multiple historical levels, and a current level
-      create(:complexity, :inactive, offender_no: offender2, created_at: Time.zone.today - 5.days)
-      create(:complexity, :inactive, offender_no: offender2, created_at: Time.zone.today - 4.days)
-      create(:complexity,            offender_no: offender2, created_at: Time.zone.today - 3.days)
-      create(:complexity,            offender_no: offender2, created_at: Time.zone.today - 2.days, notes: "2 current")
+      # Create 1 entry for offender_with_one_level
+      create(:complexity, :random_date, offender_no: offender_with_one_level)
 
-      # Offender 3 has one level, which is current
-      create(:complexity,            offender_no: offender3, created_at: Time.zone.today - 5.days, notes: "3 current")
+      # Create nothing for offender_without_levels
 
-      # Offender 4 has never had a level
-      # Offender 5 has one level, which is current
-      create(:complexity,            offender_no: offender5, created_at: Time.zone.today - 5.days)
+      # Create entries for some_other_offender
+      create_list(:complexity, 5, :random_date, offender_no: some_other_offender)
     end
 
     it "only returns offenders who have a Complexity level" do
       returned_offenders = subject.map(&:offender_no)
-      expect(returned_offenders).to contain_exactly(offender2, offender3)
+      expect(returned_offenders).not_to include(offender_without_levels)
+      expect(returned_offenders).to contain_exactly(offender_with_multiple_levels, offender_with_one_level)
     end
 
     it "returns the latest/current Complexity level for each offender" do
-      returned_offenders = subject.map(&:notes)
-      expect(returned_offenders).to contain_exactly("2 current", "3 current")
+      offenders.each do |offender|
+        most_recent = described_class.where(offender_no: offender).order(created_at: :desc).limit(1)
+        actual = subject.select { |complexity| complexity.offender_no == offender }
+        expect(actual).to eq(most_recent)
+      end
     end
   end
 end
