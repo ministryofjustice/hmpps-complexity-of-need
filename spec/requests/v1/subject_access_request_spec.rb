@@ -85,7 +85,7 @@ RSpec.describe "Subject access request", type: :request do
       end
 
       it "returns status 209" do
-        expect(response).to have_http_status "209" # rubocop:disable RSpec/Rails/HttpStatus
+        expect(response).to have_http_status "209" # rubocop:disable RSpecRails/HttpStatus
       end
 
       it_behaves_like "returns an error response"
