@@ -18,6 +18,7 @@ class ComplexitiesController < ApplicationController
     return missing_offender_numbers unless params["_json"].is_a? Array
 
     @complexities = Complexity.active.latest_for_offenders(params["_json"])
+    Rails.logger.info("ComplexitiesController.multiple: #{@complexities.size} records returned")
   end
 
   def history
