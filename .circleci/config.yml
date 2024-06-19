@@ -130,6 +130,26 @@ jobs:
           name: Rubocop
           command: bundle exec rubocop
 
+  run_tests:
+    <<: *defaults
+    <<: *test_container_config
+    steps:
+      - checkout
+      - ruby/install-deps
+      - run:
+          name: Security analysis
+          command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
+      - run:
+          name: Check code coverage
+          command: bundle exec undercover --compare origin/main
+      - run:
+          name: Run RSpec tests
+          command: bundle exec rspec --format progress --format RspecJunitFormatter --out ~/rspec/rspec.xml
+      - store_test_results:
+          path: ~/rspec
+      - store_artifacts:
+          path: coverage
+
   build_and_push_docker_image:
     <<: *defaults
     <<: *test_container_config
@@ -246,9 +266,13 @@ workflows:
       - rubocop:
           requires:
             - install_dependencies
+      - run_tests:
+          requires:
+            - install_dependencies
       - build_and_push_docker_image:
           requires:
             - rubocop
+            - run_tests
           filters:
             branches:
               only:
