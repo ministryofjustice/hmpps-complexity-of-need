@@ -6,8 +6,6 @@ class Complexity < ApplicationRecord
   end
   VALID_LEVELS = %w[low medium high].freeze
 
-  scope :active, -> { where(active: true) }
-
   validates :offender_no, presence: true
   validates :level, inclusion: {
     in: VALID_LEVELS,

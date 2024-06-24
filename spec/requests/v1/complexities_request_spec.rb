@@ -96,7 +96,6 @@ RSpec.describe "Complexities", type: :request do
       # rubocop:disable RSpec/NestedGroups
       context "with the latest complexity inactive" do
         let(:most_recent_active_status) { false }
-        let(:most_recent_active) { Complexity.active.where(offender_no: offender_no).order(created_at: :desc).first }
 
         it "returns 404" do
           expect(response).to have_http_status :not_found
