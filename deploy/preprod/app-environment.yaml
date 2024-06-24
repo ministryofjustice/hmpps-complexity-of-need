@@ -5,6 +5,7 @@ metadata:
   name: app-environment
 data:
   RAILS_ENV: "production"
+  RAILS_LOG_TO_STDOUT: "on"
   SENTRY_CURRENT_ENV: "preprod"
   COMPLEXITY_OF_NEED_HOST: "https://complexity-of-need-preprod.hmpps.service.justice.gov.uk"
   NOMIS_OAUTH_HOST: "https://sign-in-preprod.hmpps.service.justice.gov.uk"
