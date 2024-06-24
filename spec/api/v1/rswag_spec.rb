@@ -99,6 +99,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
 
         The response array:
           - will exclude offenders whose Complexity of Need level is not known (i.e. these would result in a `404 Not Found` error on the single `GET` endpoint)
+          - will exclude offenders without a current active level
           - is not sorted in the same order as the request body
           - is not paginated
       DESC
