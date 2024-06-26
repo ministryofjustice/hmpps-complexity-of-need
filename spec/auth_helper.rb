@@ -21,7 +21,7 @@ module AuthHelper
   def stub_access_token(roles: [])
     token = instance_double(HmppsApi::Oauth::Token, access_token: "dummy-access-token")
     allow(token).to receive(:has_role?) { |role| roles.include?(role) }
-    allow(token).to receive(:client_id) { ENV.fetch("NOMIS_OAUTH_CLIENT_ID") }
+    allow(token).to receive(:client_id) { Rails.configuration.nomis_oauth_client_id }
     allow(HmppsApi::Oauth::Token).to receive(:new).and_return(token)
   end
 
