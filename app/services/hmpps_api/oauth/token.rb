@@ -31,10 +31,6 @@ module HmppsApi
         @payload.fetch("authorities", []).include?(role)
       end
 
-      def has_scope?(scope)
-        @payload.fetch("scope", []).include?(scope)
-      end
-
       def self.from_json(payload)
         Token.new(payload.fetch("access_token"))
       end

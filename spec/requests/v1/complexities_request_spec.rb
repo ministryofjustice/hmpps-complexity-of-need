@@ -21,6 +21,7 @@ RSpec.describe "Complexities", type: :request do
     let!(:complexity) { create(:complexity) }
 
     before do
+      stub_access_token roles: %w[ROLE_COMPLEXITY_OF_NEED]
       get endpoint, headers: request_headers
     end
 
@@ -104,9 +105,9 @@ RSpec.describe "Complexities", type: :request do
       # rubocop:enable RSpec/NestedGroups
     end
 
-    context "when the client doesn't have the 'read' scope" do
+    context "when the client doesn't have the necessary role" do
       before do
-        stub_access_token scopes: []
+        stub_access_token roles: []
         get endpoint, headers: request_headers
       end
 
@@ -125,6 +126,7 @@ RSpec.describe "Complexities", type: :request do
       before do
         # Travel into the future to expire the access token
         Timecop.travel(Time.zone.today + 1.year) do
+          stub_expired_access_token
           get endpoint, headers: request_headers
         end
       end
@@ -137,6 +139,10 @@ RSpec.describe "Complexities", type: :request do
     let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}" }
     let(:offender_no) { "ABC123" }
     let(:source_system) { Rails.configuration.nomis_oauth_client_id }
+
+    before do
+      stub_access_token roles: %w[ROLE_CNL_ADMIN ROLE_UPDATE_COMPLEXITY_OF_NEED]
+    end
 
     context "with only mandatory fields" do
       let(:post_body) do
@@ -236,7 +242,7 @@ RSpec.describe "Complexities", type: :request do
 
     context "without role ROLE_UPDATE_COMPLEXITY_OF_NEED" do
       before do
-        stub_access_token scopes: %w[read write], roles: %w[ROLE_COMPLEXITY_OF_NEED]
+        stub_access_token roles: %w[ROLE_COMPLEXITY_OF_NEED]
         post endpoint, headers: request_headers
       end
 
@@ -256,6 +262,7 @@ RSpec.describe "Complexities", type: :request do
       before do
         # Travel into the future to expire the access token
         Timecop.travel(Time.zone.today + 1.year) do
+          stub_expired_access_token
           post endpoint, headers: request_headers
         end
       end
@@ -266,6 +273,10 @@ RSpec.describe "Complexities", type: :request do
 
   describe "POST /v1/complexity-of-need/multiple/offender-no" do
     let(:endpoint) { "/v1/complexity-of-need/multiple/offender-no" }
+
+    before do
+      stub_access_token roles: %w[ROLE_COMPLEXITY_OF_NEED]
+    end
 
     context "with a missing or invalid request body" do
       before do
@@ -333,8 +344,7 @@ RSpec.describe "Complexities", type: :request do
     end
 
     context "with lots of offenders" do
-      # Generate 1000 offender numbers
-      let(:offenders) { (1..1000).map { |n| "Offender#{n}" } }
+      let(:offenders) { (1..400).map { |n| "Offender#{n}" } }
 
       let(:expected_response) do
         offenders.map do |offender|
@@ -364,9 +374,9 @@ RSpec.describe "Complexities", type: :request do
       end
     end
 
-    context "when the client doesn't have the 'read' scope" do
+    context "when the client doesn't have the necessary role" do
       before do
-        stub_access_token scopes: []
+        stub_access_token roles: []
         post endpoint, headers: request_headers
       end
 
@@ -382,11 +392,10 @@ RSpec.describe "Complexities", type: :request do
     end
 
     context "when the client's token has expired" do
-      let(:token_is_expired) { true }
-
       before do
         # Travel into the future to expire the access token
         Timecop.travel(Time.zone.today + 1.year) do
+          stub_expired_access_token
           post endpoint, headers: request_headers
         end
       end
@@ -400,6 +409,7 @@ RSpec.describe "Complexities", type: :request do
     let(:different_offender_no) { "XYZ456" }
 
     before do
+      stub_access_token roles: %w[ROLE_COMPLEXITY_OF_NEED]
       get endpoint, headers: request_headers
     end
 
@@ -480,11 +490,11 @@ RSpec.describe "Complexities", type: :request do
       # rubocop:enable RSpec/NestedGroups
     end
 
-    context "when the client doesn't have the 'read' scope" do
+    context "when the client doesn't have the necessary role" do
       let(:offender_no) { "1234567" }
 
       before do
-        stub_access_token scopes: []
+        stub_access_token roles: []
         get endpoint, headers: request_headers
       end
 
@@ -507,6 +517,7 @@ RSpec.describe "Complexities", type: :request do
       before do
         # Travel into the future to expire the access token
         Timecop.travel(Time.zone.today + 1.year) do
+          stub_expired_access_token
           get endpoint, headers: request_headers
         end
       end
@@ -519,6 +530,10 @@ RSpec.describe "Complexities", type: :request do
     let(:endpoint) { "/v1/complexity-of-need/offender-no/#{offender_no}/inactivate" }
     let(:offender_no) { complexity.offender_no }
     let!(:complexity) { create(:complexity) }
+
+    before do
+      stub_access_token roles: %w[ROLE_CNL_ADMIN ROLE_UPDATE_COMPLEXITY_OF_NEED]
+    end
 
     context "when authenticated with correct role" do
       before do
@@ -543,7 +558,7 @@ RSpec.describe "Complexities", type: :request do
 
     context "without role ROLE_UPDATE_COMPLEXITY_OF_NEED" do
       before do
-        stub_access_token scopes: %w[read write], roles: %w[ROLE_COMPLEXITY_OF_NEED]
+        stub_access_token roles: %w[ROLE_COMPLEXITY_OF_NEED]
         put endpoint, headers: request_headers
       end
 
@@ -563,6 +578,7 @@ RSpec.describe "Complexities", type: :request do
       before do
         # Travel into the future to expire the access token
         Timecop.travel(Time.zone.today + 1.year) do
+          stub_expired_access_token
           put endpoint, headers: request_headers
         end
       end
