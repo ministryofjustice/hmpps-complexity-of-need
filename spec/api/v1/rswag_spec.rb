@@ -32,7 +32,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
 
       response "200", "Offender's current Complexity of Need level found" do
         before do
-          create(:complexity, :with_user, offender_no: offender_no)
+          create(:complexity, :with_user, offender_no:)
         end
 
         schema "$ref" => "#/components/schemas/ComplexityOfNeed"
@@ -167,8 +167,8 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
 
       response "200", "Offender's Complexity of Need history found" do
         before do
-          create(:complexity, :with_user, offender_no: offender_no, created_at: 1.month.ago, updated_at: 1.month.ago)
-          create(:complexity, :with_user, offender_no: offender_no)
+          create(:complexity, :with_user, offender_no:, created_at: 1.month.ago, updated_at: 1.month.ago)
+          create(:complexity, :with_user, offender_no:)
         end
 
         schema type: :array, items: { "$ref" => "#/components/schemas/ComplexityOfNeed" }
@@ -212,7 +212,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
 
       response "200", "Complexity of Need level inactivated successfully" do
         before do
-          create(:complexity, :with_user, offender_no: offender_no)
+          create(:complexity, :with_user, offender_no:)
         end
 
         schema "$ref" => "#/components/schemas/ComplexityOfNeed"

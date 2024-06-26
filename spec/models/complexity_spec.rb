@@ -38,8 +38,8 @@ RSpec.describe Complexity, type: :model do
   it "sends a complexity SNS message after save" do
     complexity.save!
     expect(topic).to have_received(:publish).with(
-      message: message,
-      message_attributes: hash_including(eventType: event_type, version: version, detailURL: url),
+      message:,
+      message_attributes: hash_including(eventType: event_type, version:, detailURL: url),
     )
   end
 
@@ -53,7 +53,7 @@ RSpec.describe Complexity, type: :model do
     describe "#level" do
       it "can only be: low, medium or high" do
         described_class::VALID_LEVELS.each do |level|
-          expect(build(:complexity, level: level)).to be_valid
+          expect(build(:complexity, level:)).to be_valid
         end
 
         %w[any other value].each do |bad_level|

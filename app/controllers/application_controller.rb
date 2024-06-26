@@ -46,6 +46,6 @@ private
   end
 
   def render_forbidden(message)
-    render json: { message: message }, status: :forbidden
+    render json: { message: }, status: :forbidden
   end
 end

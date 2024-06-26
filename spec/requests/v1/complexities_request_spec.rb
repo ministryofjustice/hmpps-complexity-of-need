@@ -70,13 +70,13 @@ RSpec.describe "Complexities", type: :request do
       let(:complexity) { nil }
       let(:offender_no) { "ABC123" }
       let(:different_offender_no) { "XYZ456" }
-      let(:most_recent) { Complexity.where(offender_no: offender_no).order(created_at: :desc).first }
+      let(:most_recent) { Complexity.where(offender_no:).order(created_at: :desc).first }
       let(:most_recent_active_status) { true }
 
       before do
         # Populate database with multiple records for multiple offenders
         [1.month.ago, 1.week.ago, 1.day.ago].each do |date|
-          create(:complexity, offender_no: offender_no, created_at: date, updated_at: date)
+          create(:complexity, offender_no:, created_at: date, updated_at: date)
           create(:complexity, offender_no: different_offender_no, created_at: date, updated_at: date)
         end
 
@@ -157,7 +157,7 @@ RSpec.describe "Complexities", type: :request do
 
       it "creates a new record" do
         expect(response).to have_http_status :ok
-        complexity = Complexity.find_by!(offender_no: offender_no)
+        complexity = Complexity.find_by!(offender_no:)
         expect(response_json)
           .to eq json_object(offenderNo: offender_no,
                              level: post_body.fetch(:level),
@@ -182,7 +182,7 @@ RSpec.describe "Complexities", type: :request do
 
       it "creates a new record" do
         expect(response).to have_http_status :ok
-        complexity = Complexity.find_by!(offender_no: offender_no)
+        complexity = Complexity.find_by!(offender_no:)
         expect(response_json)
           .to eq json_object(sourceUser: post_body.fetch(:sourceUser),
                              notes: post_body.fetch(:notes),
@@ -445,13 +445,13 @@ RSpec.describe "Complexities", type: :request do
 
     context "with multiple entries" do
       let(:offender_no) { "1234567" }
-      let(:history) { Complexity.order(created_at: :desc).where(offender_no: offender_no) }
+      let(:history) { Complexity.order(created_at: :desc).where(offender_no:) }
       let(:some_inactive) { false }
 
       before do
         # Populate database with multiple records for multiple offenders
         [1.month.ago, 3.weeks.ago, 1.week.ago, 1.day.ago].each_with_index do |date, i|
-          create(:complexity, offender_no: offender_no, created_at: date, updated_at: date, active: some_inactive ? i.odd? : true)
+          create(:complexity, offender_no:, created_at: date, updated_at: date, active: some_inactive ? i.odd? : true)
           create(:complexity, offender_no: different_offender_no, created_at: date, updated_at: date)
         end
 
@@ -545,7 +545,7 @@ RSpec.describe "Complexities", type: :request do
       end
 
       it "inactivates the latest record" do
-        complexity = Complexity.find_by!(offender_no: offender_no)
+        complexity = Complexity.find_by!(offender_no:)
         expect(response_json)
           .to eq json_object(offenderNo: offender_no,
                              level: complexity.level,

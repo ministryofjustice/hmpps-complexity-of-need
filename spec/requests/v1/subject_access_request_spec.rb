@@ -25,9 +25,9 @@ RSpec.describe "Subject access request", type: :request do
     let(:time3) { Time.zone.now - 1.day }
 
     let(:offender_no) { "A000BC" }
-    let!(:complexity1) { create(:complexity, offender_no: offender_no, created_at: time1, active: true) }
-    let!(:complexity2) { create(:complexity, offender_no: offender_no, created_at: time2, active: false) }
-    let!(:complexity3) { create(:complexity, offender_no: offender_no, created_at: time3, active: true) }
+    let!(:complexity1) { create(:complexity, offender_no:, created_at: time1, active: true) }
+    let!(:complexity2) { create(:complexity, offender_no:, created_at: time2, active: false) }
+    let!(:complexity3) { create(:complexity, offender_no:, created_at: time3, active: true) }
 
     shared_context "with mocked token" do
       before do
