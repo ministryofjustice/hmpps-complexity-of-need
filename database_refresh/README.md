@@ -4,7 +4,7 @@ This folder contains the following kubernetes config:
 
 - `01-configmap-refresh-script.yaml` Defines the bash script used to perform the db dump and restore
 - `02-cronjob.yaml` Defines the cronjob which launches the job on a weekly basis.
-- `03-prometheus-alert.yaml` Define alert which will tell us if the refresh job failed, alert sent to `#dps_alerts`
+- `03-prometheus-alert.yaml` Define alert which will tell us if the refresh job failed, alert sent to `#cvl_alerts`
 
 If setting this up for the first time **_use extreme caution_** - this job connects to production databases.
 
@@ -12,7 +12,7 @@ If setting this up for the first time **_use extreme caution_** - this job conne
 
 Also check that the rule defined in `03-prometheus-alert.yaml` has the correct namespace specified, update the the rule if needed.
 
-### Prerequisite:
+### Prerequisites
 
 For this job to work the preprod database credentials need to be available production namespace. This is achieved by having terraform export the preprod credentials, which is an output of the terraform rds module, to a secret in the production namespace. See this example:
 
