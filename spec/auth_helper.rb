@@ -26,6 +26,10 @@ module AuthHelper
   end
 
   def stub_expired_access_token
-    allow(HmppsApi::Oauth::Token).to receive(:new).and_raise(JWT::ExpiredSignature)
+    if ENV["CIRCLECI"].present?
+      allow(HmppsApi::Oauth::Token).to receive(:new).and_raise(JWT::ExpiredSignature)
+    else
+      allow(HmppsApi::Oauth::Token).to receive(:new).and_call_original
+    end
   end
 end
