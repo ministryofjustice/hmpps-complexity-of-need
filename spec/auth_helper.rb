@@ -8,7 +8,7 @@ module AuthHelper
     # When running tests in CI, we mock auth calls
     # Otherwise, return a valid Authorization HTTP header with a real access token
     # This allows us to test the HMPPS Auth integration
-    if ENV["CIRCLECI"].present?
+    if ENV["MOCK_AUTH"].present?
       allow(oauth_client).to receive(:post).with(route).and_return({ "access_token" => "dummy-access-token" })
     end
 
@@ -26,7 +26,7 @@ module AuthHelper
   end
 
   def stub_expired_access_token
-    if ENV["CIRCLECI"].present?
+    if ENV["MOCK_AUTH"].present?
       allow(HmppsApi::Oauth::Token).to receive(:new).and_raise(JWT::ExpiredSignature)
     else
       allow(HmppsApi::Oauth::Token).to receive(:new).and_call_original

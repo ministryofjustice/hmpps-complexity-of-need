@@ -28,6 +28,7 @@ references:
           AWS_DEFAULT_REGION: eu-west-2
           NOMIS_OAUTH_HOST: https://test-auth-service.example.com
           NOMIS_OAUTH_CLIENT_ID: test-client-id
+          MOCK_AUTH: 1
       - image: circleci/postgres:10.5-alpine
         environment:
           POSTGRES_USER: ubuntu
