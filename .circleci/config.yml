@@ -130,7 +130,7 @@ jobs:
       - ruby/install-deps
       - run:
           name: Rubocop
-          command: bundle exec rubocop
+          command: bundle exec rubocop --no-parallel
 
   run_tests:
     <<: *defaults
