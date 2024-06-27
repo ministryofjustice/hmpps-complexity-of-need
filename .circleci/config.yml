@@ -126,7 +126,7 @@ jobs:
             kubectl delete job hmpps-complexity-of-need-migration --ignore-not-found
             sed -i -e s/:latest/:${APP_VERSION}/ deploy/staging/deployment.yaml
             sed -i -e s/:latest/:${APP_VERSION}/ deploy/staging/migration-job.yaml
-            kubectl apply --record=false -f ./deploy/staging
+            kubectl apply -f ./deploy/staging
             kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
@@ -161,7 +161,7 @@ jobs:
             kubectl delete job rails-db-migration --ignore-not-found
             sed -i -e s/:latest/:${APP_VERSION}/ deploy/preprod/deployment.yaml
             sed -i -e s/:latest/:${APP_VERSION}/ deploy/preprod/migration-job.yaml
-            kubectl apply --record=false -f ./deploy/preprod
+            kubectl apply -f ./deploy/preprod
             kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
@@ -196,7 +196,7 @@ jobs:
             kubectl delete job rails-db-migration --ignore-not-found
             sed -i -e s/:latest/:${APP_VERSION}/ deploy/production/deployment.yaml
             sed -i -e s/:latest/:${APP_VERSION}/ deploy/production/migration-job.yaml
-            kubectl apply --record=false -f ./deploy/production
+            kubectl apply -f ./deploy/production
             kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
