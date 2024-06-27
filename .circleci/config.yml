@@ -3,6 +3,7 @@ references:
     GITHUB_TEAM_NAME_SLUG: offender-management
 
   deploy_container_config: &deploy_container_config
+    working_directory: ~/app
     resource_class: small
     docker:
       - image: ministryofjustice/cloud-platform-tools
@@ -12,6 +13,7 @@ references:
           KUBE_ENV_PRODUCTION_NAMESPACE: hmpps-complexity-of-need-production
 
   test_container_config: &test_container_config
+    working_directory: ~/app
     resource_class: small
     docker:
       - image: cimg/ruby:3.3.3
