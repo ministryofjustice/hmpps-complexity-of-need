@@ -103,6 +103,8 @@ jobs:
     <<: *deploy_container_config
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Kubectl deployment to live cluster staging setup
           command: |
@@ -136,6 +138,8 @@ jobs:
     <<: *deploy_container_config
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Kubectl deployment preprod setup
           command: |
@@ -169,6 +173,8 @@ jobs:
     <<: *deploy_container_config
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Kubectl deployment production setup
           command: |
