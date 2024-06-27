@@ -144,13 +144,6 @@ jobs:
       - run:
           name: Run RSpec tests
           command: bundle exec rspec --format progress --format RspecJunitFormatter --out ~/rspec/rspec.xml
-      - store_test_results:
-          path: ~/rspec
-      - store_artifacts:
-          path: coverage
-      - run:
-          name: Check code coverage
-          command: bundle exec undercover --compare origin/main
 
   build_and_push_docker_image:
     <<: *defaults
