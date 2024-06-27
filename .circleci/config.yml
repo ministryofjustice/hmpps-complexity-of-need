@@ -1,11 +1,6 @@
 references:
-  defaults: &defaults
-    working_directory: ~/repo
-
   github_team_name_slug: &github_team_name_slug
     GITHUB_TEAM_NAME_SLUG: offender-management
-    QUAYIO_REPO: quay.io/hmpps/hmpps-complexity-of-need
-    REPONAME: hmpps-complexity-of-need
 
   deploy_container_config: &deploy_container_config
     resource_class: small
@@ -62,14 +57,6 @@ references:
         /usr/libexec/gpg-preset-passphrase --preset --passphrase $GPG_PASSPHRASE $GPG_KEY_KEYGRIP_ID
         git-crypt unlock
 
-  install_aws_cli: &install_aws_cli
-    run:
-      name: Set up aws
-      command: |
-        sudo apt-get update
-        sudo apt-get --assume-yes install python3-pip
-        sudo pip3 install awscli
-
   install_yq: &install_yq
     run:
       name: Install yq (YAML parser)
@@ -80,35 +67,6 @@ references:
         VERSION: v4.6.3
         BINARY: yq_linux_amd64
 
-  build_docker_image: &build_docker_image
-    run:
-      name: Build docker image
-      command: |
-        export BUILD_DATE=$(date -Is) >> $BASH_ENV
-        source $BASH_ENV
-        docker build \
-          --build-arg VERSION_NUMBER=${CIRCLE_BUILD_NUM} \
-          --build-arg COMMIT_ID=${CIRCLE_SHA1} \
-          --build-arg BUILD_DATE=${BUILD_DATE} \
-          --build-arg BUILD_TAG=${CIRCLE_BRANCH} \
-          -t app .
-
-  push_docker_image: &push_docker_image
-    run:
-      name: Push docker image
-      command: |
-        set -xeuo pipefail
-        docker login --username "${QUAYIO_USERNAME}" --password "${QUAYIO_PASSWORD}" quay.io
-        docker tag app "${QUAYIO_REPO}:${CIRCLE_SHA1}"
-        docker push "${QUAYIO_REPO}:${CIRCLE_SHA1}"
-
-        if [ "${CIRCLE_BRANCH}" == "main" ]; then
-          docker tag app "${QUAYIO_REPO}:latest"
-          docker push "${QUAYIO_REPO}:latest"
-        fi
-      environment:
-        <<: *github_team_name_slug
-
 version: 2.1
 
 orbs:
@@ -117,14 +75,12 @@ orbs:
 
 jobs:
   install_dependencies:
-    <<: *defaults
     <<: *test_container_config
     steps:
       - checkout
       - ruby/install-deps
 
   rubocop:
-    <<: *defaults
     <<: *test_container_config
     steps:
       - checkout
@@ -132,7 +88,6 @@ jobs:
       - ruby/rubocop-check
 
   run_tests:
-    <<: *defaults
     <<: *test_container_config
     steps:
       - checkout
@@ -141,19 +96,6 @@ jobs:
           name: Security analysis
           command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - ruby/rspec-test
-
-  build_and_push_docker_image:
-    <<: *defaults
-    <<: *test_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/repo
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - *install_aws_cli
-      - *build_docker_image
-      - *push_docker_image
 
   deploy_staging:
     <<: *deploy_container_config
@@ -173,19 +115,20 @@ jobs:
       - *configure_gpg
       - *decrypt_secrets
       - *install_yq
+      - hmpps/recall_container_image
       - run:
           name: Deploy to staging
           command: |
             kubectl delete job hmpps-complexity-of-need-migration --ignore-not-found
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/deployment.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/staging/migration-job.yaml
+            sed -i -e s/:latest/:${APP_VERSION}/ deploy/staging/deployment.yaml
+            sed -i -e s/:latest/:${APP_VERSION}/ deploy/staging/migration-job.yaml
             kubectl apply --record=false -f ./deploy/staging
             kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
       - run:
           name: Wait for Kube to spin up new pods
-          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_STAGING_NAMESPACE" "hmpps-complexity-of-need" "$CIRCLE_SHA1"
+          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_STAGING_NAMESPACE" "hmpps-complexity-of-need" "${APP_VERSION}"
 
   deploy_preprod:
     <<: *deploy_container_config
@@ -205,19 +148,20 @@ jobs:
       - *configure_gpg
       - *decrypt_secrets
       - *install_yq
+      - hmpps/recall_container_image
       - run:
           name: Deploy to pre-production
           command: |
             kubectl delete job rails-db-migration --ignore-not-found
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/deployment.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/preprod/migration-job.yaml
+            sed -i -e s/:latest/:${APP_VERSION}/ deploy/preprod/deployment.yaml
+            sed -i -e s/:latest/:${APP_VERSION}/ deploy/preprod/migration-job.yaml
             kubectl apply --record=false -f ./deploy/preprod
             kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
       - run:
           name: Wait for Kube to spin up new pods
-          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_PREPROD_NAMESPACE" "hmpps-complexity-of-need" "$CIRCLE_SHA1"
+          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_PREPROD_NAMESPACE" "hmpps-complexity-of-need" "${APP_VERSION}"
 
   deploy_production:
     <<: *deploy_container_config
@@ -237,19 +181,20 @@ jobs:
       - *configure_gpg
       - *decrypt_secrets
       - *install_yq
+      - hmpps/recall_container_image
       - run:
           name: Deploy to production
           command: |
             kubectl delete job rails-db-migration --ignore-not-found
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/deployment.yaml
-            sed -i -e s/:latest/:$CIRCLE_SHA1/ deploy/production/migration-job.yaml
+            sed -i -e s/:latest/:${APP_VERSION}/ deploy/production/deployment.yaml
+            sed -i -e s/:latest/:${APP_VERSION}/ deploy/production/migration-job.yaml
             kubectl apply --record=false -f ./deploy/production
             kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
           environment:
             <<: *github_team_name_slug
       - run:
           name: Wait for Kube to spin up new pods
-          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_PRODUCTION_NAMESPACE" "hmpps-complexity-of-need" "$CIRCLE_SHA1"
+          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_PRODUCTION_NAMESPACE" "hmpps-complexity-of-need" "${APP_VERSION}"
 
 workflows:
   build_and_test:
@@ -261,22 +206,24 @@ workflows:
       - run_tests:
           requires:
             - install_dependencies
-      - build_and_push_docker_image:
+      - hmpps/build_docker:
+          name: build_and_push_image
+          persist_container_image: true
           requires:
             - rubocop
             - run_tests
-          filters:
-            branches:
-              only:
-                - main
-                - preprod
+#          filters:
+#            branches:
+#              only:
+#                - main
+#                - preprod
       - deploy_staging:
           requires:
-            - build_and_push_docker_image
-          filters:
-            branches:
-              only:
-                - main
+            - build_and_push_image
+#          filters:
+#            branches:
+#              only:
+#                - main
       - deploy_production_approval:
           type: approval
           requires:
@@ -292,7 +239,7 @@ workflows:
               only: main
       - deploy_preprod:
           requires:
-            - build_and_push_docker_image
+            - build_and_push_image
           filters:
             branches:
               only: preprod
