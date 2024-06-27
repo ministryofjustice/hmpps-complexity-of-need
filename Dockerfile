@@ -42,7 +42,7 @@ RUN \
   && gem update bundler --no-document \
   && apt-get clean
 
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile* .ruby-version ./
 
 RUN bundle install --without development test --jobs 2 --retry 3
 
