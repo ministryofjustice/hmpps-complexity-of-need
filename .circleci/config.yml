@@ -220,18 +220,18 @@ workflows:
           requires:
             - rubocop
             - run_tests
-#          filters:
-#            branches:
-#              only:
-#                - main
-#                - preprod
+          filters:
+            branches:
+              only:
+                - main
+                - preprod
       - deploy_staging:
           requires:
             - build_and_push_image
-#          filters:
-#            branches:
-#              only:
-#                - main
+          filters:
+            branches:
+              only:
+                - main
       - deploy_production_approval:
           type: approval
           requires:
