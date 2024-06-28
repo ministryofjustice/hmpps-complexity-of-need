@@ -21,9 +21,9 @@ ARG BUILD_NUMBER
 ARG GIT_BRANCH
 ARG GIT_REF
 
-ENV APP_VERSION=${BUILD_NUMBER}
-ENV APP_GIT_BRANCH=${GIT_BRANCH}
-ENV APP_GIT_REF=${GIT_REF}
+ENV BUILD_NUMBER=${BUILD_NUMBER}
+ENV GIT_BRANCH=${GIT_BRANCH}
+ENV GIT_REF=${GIT_REF}
 
 WORKDIR /app
 
@@ -48,7 +48,7 @@ COPY . /app
 
 # Record the SHA1 git commit reference in /app/RELEASE
 # This file is automatically used by Sentry to track releases
-RUN echo -n "$APP_GIT_REF" > /app/RELEASE
+RUN echo -n "$GIT_REF" > /app/RELEASE
 
 RUN mkdir -p /home/appuser && \
   useradd appuser -u 1001 --user-group --home /home/appuser && \
