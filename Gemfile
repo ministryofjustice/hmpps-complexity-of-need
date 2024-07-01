@@ -13,6 +13,9 @@ gem "faraday"
 gem "drb"
 gem "mutex_m"
 
+# Needed until Ruby 3.3.4 is released https://github.com/ruby/ruby/pull/11006
+gem "net-pop", github: "ruby/net-pop"
+
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem "jbuilder", "~> 2.7"
 gem "jwt"
