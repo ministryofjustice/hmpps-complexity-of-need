@@ -215,6 +215,14 @@ workflows:
           requires:
             - install_dependencies
       - hmpps/build_docker:
+          name: verify_docker_image
+          publish: false
+          filters:
+            branches:
+              ignore:
+                - main
+                - preprod
+      - hmpps/build_docker:
           name: build_and_push_image
           persist_container_image: true
           requires:
