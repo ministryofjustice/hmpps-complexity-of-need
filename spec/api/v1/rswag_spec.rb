@@ -9,7 +9,7 @@ require "swagger_helper"
 # rubocop:disable RSpec/EmptyExampleGroup
 # rubocop:disable RSpec/ScatteredSetup
 describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
-  let(:topic) { instance_double("topic", publish: nil) }
+  let(:topic) { instance_double(Aws::SNS::Topic, publish: nil) }
   # Authorization header needs to be defined for rswag
   let(:Authorization) { auth_header } # rubocop:disable RSpec/VariableName
 

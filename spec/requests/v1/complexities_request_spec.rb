@@ -9,7 +9,7 @@ RSpec.describe "Complexities", type: :request do
     # Include an Authorization header to make the request valid
     { "Authorization" => auth_header }
   end
-  let(:topic) { instance_double("topic", publish: nil) }
+  let(:topic) { instance_double(Aws::SNS::Topic, publish: nil) }
 
   before do
     allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
@@ -552,7 +552,7 @@ RSpec.describe "Complexities", type: :request do
                              sourceSystem: complexity.source_system,
                              createdTimeStamp: complexity.created_at,
                              active: complexity.active)
-        expect(complexity.active).to eq(false)
+        expect(complexity.active).to be(false)
       end
     end
 
