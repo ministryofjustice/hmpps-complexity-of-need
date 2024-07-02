@@ -238,8 +238,13 @@ workflows:
             - build_and_push_image
           filters:
             branches:
-              only:
-                - main
+              only: main
+      - deploy_preprod:
+          requires:
+            - build_and_push_image
+          filters:
+            branches:
+              only: main
       - deploy_production_approval:
           type: approval
           requires:
