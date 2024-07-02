@@ -177,7 +177,7 @@ paths:
         '401':
           description: Invalid or missing access token
         '403':
-          description: Access token is missing scope `read`
+          description: Access token is missing necessary role
         '404':
           description: The Complexity of Need level for this offender is not known
     post:
@@ -199,8 +199,7 @@ paths:
         '401':
           description: Invalid or missing access token
         '403':
-          description: Access token is missing role `ROLE_COMPLEXITY_OF_NEED` or scope
-            `write`
+          description: Access token is missing role `ROLE_COMPLEXITY_OF_NEED`
       requestBody:
         content:
           application/json:
@@ -235,7 +234,7 @@ paths:
         '401':
           description: Invalid or missing access token
         '403':
-          description: Access token is missing scope `read`
+          description: Access token is missing necessary role
       requestBody:
         content:
           application/json:
@@ -274,7 +273,7 @@ paths:
         '401':
           description: Invalid or missing access token
         '403':
-          description: Access token is missing scope `read`
+          description: Access token is missing necessary role
         '404':
           description: The Complexity of Need level for this offender is not known
   "/v1/complexity-of-need/offender-no/{offender_no}/inactivate":
@@ -301,8 +300,7 @@ paths:
         '401':
           description: Invalid or missing access token
         '403':
-          description: Access token is missing role `ROLE_COMPLEXITY_OF_NEED` or scope
-            `write`
+          description: Access token is missing role `ROLE_COMPLEXITY_OF_NEED`
   "/subject-access-request":
     get:
       summary: API call to retrieve SAR data from a product

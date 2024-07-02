@@ -25,13 +25,13 @@ RSpec.describe "Subject access request", type: :request do
     let(:time3) { Time.zone.now - 1.day }
 
     let(:offender_no) { "A000BC" }
-    let!(:complexity1) { create(:complexity, offender_no: offender_no, created_at: time1, active: true) }
-    let!(:complexity2) { create(:complexity, offender_no: offender_no, created_at: time2, active: false) }
-    let!(:complexity3) { create(:complexity, offender_no: offender_no, created_at: time3, active: true) }
+    let!(:complexity1) { create(:complexity, offender_no:, created_at: time1, active: true) }
+    let!(:complexity2) { create(:complexity, offender_no:, created_at: time2, active: false) }
+    let!(:complexity3) { create(:complexity, offender_no:, created_at: time3, active: true) }
 
     shared_context "with mocked token" do
       before do
-        stub_access_token scopes: %w[read write], roles: %w[ROLE_SAR_DATA_ACCESS]
+        stub_access_token roles: %w[ROLE_SAR_DATA_ACCESS]
         get endpoint, headers: request_headers, params: get_body
       end
     end
@@ -145,7 +145,7 @@ RSpec.describe "Subject access request", type: :request do
 
     context "when the client lacks the ROLE_SAR_DATA_ACCESS role" do
       before do
-        stub_access_token scopes: %w[read write], roles: %w[ROLE_WHATEVER]
+        stub_access_token roles: %w[ROLE_WHATEVER]
         get endpoint, headers: request_headers
       end
 
@@ -153,7 +153,7 @@ RSpec.describe "Subject access request", type: :request do
 
       context "with the role ROLE_CNL_ADMIN" do # rubocop:disable RSpec/NestedGroups
         before do
-          stub_access_token scopes: %w[read write], roles: %w[ROLE_CNL_ADMIN]
+          stub_access_token roles: %w[ROLE_CNL_ADMIN]
           get endpoint, headers: request_headers, params: { prn: offender_no }
         end
 

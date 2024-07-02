@@ -26,9 +26,13 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
     get "Retrieve the current Complexity of Need level for an offender" do
       tags "Single Offender"
 
+      before do
+        stub_access_token roles: %w[ROLE_COMPLEXITY_OF_NEED]
+      end
+
       response "200", "Offender's current Complexity of Need level found" do
         before do
-          create(:complexity, :with_user, offender_no: offender_no)
+          create(:complexity, :with_user, offender_no:)
         end
 
         schema "$ref" => "#/components/schemas/ComplexityOfNeed"
@@ -42,9 +46,9 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
         run_test!
       end
 
-      response "403", "Access token is missing scope `read`" do
+      response "403", "Access token is missing necessary role" do
         before do
-          stub_access_token scopes: []
+          stub_access_token roles: []
         end
 
         run_test!
@@ -60,6 +64,10 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
       description "Clients calling this endpoint must have role: `ROLE_UPDATE_COMPLEXITY_OF_NEED`"
 
       parameter name: :body, in: :body, schema: { "$ref" => "#/components/schemas/NewComplexityOfNeed" }
+
+      before do
+        stub_access_token roles: %w[ROLE_CNL_ADMIN ROLE_UPDATE_COMPLEXITY_OF_NEED]
+      end
 
       response "200", "Complexity of Need level set successfully" do
         schema "$ref" => "#/components/schemas/ComplexityOfNeed"
@@ -81,9 +89,9 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
         run_test!
       end
 
-      response "403", "Access token is missing role `ROLE_COMPLEXITY_OF_NEED` or scope `write`" do
+      response "403", "Access token is missing role `ROLE_COMPLEXITY_OF_NEED`" do
         before do
-          stub_access_token scopes: %w[read], roles: %w[SOME_OTHER_ROLE]
+          stub_access_token roles: %w[SOME_OTHER_ROLE]
         end
 
         run_test!
@@ -92,6 +100,10 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
   end
 
   path "/complexity-of-need/multiple/offender-no" do
+    before do
+      stub_access_token roles: %w[ROLE_COMPLEXITY_OF_NEED]
+    end
+
     post "Retrieve the current Complexity of Need levels for multiple offenders" do
       tags "Multiple Offenders"
       description <<~DESC
@@ -129,9 +141,9 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
         run_test!
       end
 
-      response "403", "Access token is missing scope `read`" do
+      response "403", "Access token is missing necessary role" do
         before do
-          stub_access_token scopes: []
+          stub_access_token roles: []
         end
 
         run_test!
@@ -145,14 +157,18 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
 
     let(:offender_no) { "G4273GI" }
 
+    before do
+      stub_access_token roles: %w[ROLE_COMPLEXITY_OF_NEED]
+    end
+
     get "Retrieve full history of Complexity of Needs for an offender" do
       tags "Single Offender"
       description "Results are sorted chronologically (newest first, oldest last)"
 
       response "200", "Offender's Complexity of Need history found" do
         before do
-          create(:complexity, :with_user, offender_no: offender_no, created_at: 1.month.ago, updated_at: 1.month.ago)
-          create(:complexity, :with_user, offender_no: offender_no)
+          create(:complexity, :with_user, offender_no:, created_at: 1.month.ago, updated_at: 1.month.ago)
+          create(:complexity, :with_user, offender_no:)
         end
 
         schema type: :array, items: { "$ref" => "#/components/schemas/ComplexityOfNeed" }
@@ -166,9 +182,9 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
         run_test!
       end
 
-      response "403", "Access token is missing scope `read`" do
+      response "403", "Access token is missing necessary role" do
         before do
-          stub_access_token scopes: []
+          stub_access_token roles: []
         end
 
         run_test!
@@ -186,13 +202,17 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
 
     let(:offender_no) { "G4273GI" }
 
+    before do
+      stub_access_token roles: %w[ROLE_CNL_ADMIN ROLE_UPDATE_COMPLEXITY_OF_NEED]
+    end
+
     put "Inactivate the Complexity of Need level for an offender" do
       tags "Single Offender"
       description "Clients calling this endpoint must have role: `ROLE_UPDATE_COMPLEXITY_OF_NEED`"
 
       response "200", "Complexity of Need level inactivated successfully" do
         before do
-          create(:complexity, :with_user, offender_no: offender_no)
+          create(:complexity, :with_user, offender_no:)
         end
 
         schema "$ref" => "#/components/schemas/ComplexityOfNeed"
@@ -206,9 +226,9 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.yaml" do
         run_test!
       end
 
-      response "403", "Access token is missing role `ROLE_COMPLEXITY_OF_NEED` or scope `write`" do
+      response "403", "Access token is missing role `ROLE_COMPLEXITY_OF_NEED`" do
         before do
-          stub_access_token scopes: %w[read], roles: %w[SOME_OTHER_ROLE]
+          stub_access_token roles: %w[SOME_OTHER_ROLE]
         end
 
         run_test!

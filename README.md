@@ -10,4 +10,6 @@ API Specification [![API docs](https://img.shields.io/badge/API_docs-view-85EA2D
 
 Posted event Specification [![Event docs](https://img.shields.io/badge/Event_docs-view-85EA2D.svg)](https://playground.asyncapi.io/?url=https://raw.githubusercontent.com/ministryofjustice/hmpps-complexity-of-need/main/Complexity%20of%20Need%20Event%20Specification.yaml)
 
-IMPORTANT NOTE: The *run_tests* job has been temporarily removed from `.circleci/config.yml` until the failing authorisation from CircleCI has been fixed, or the authorisation endpoints are mocked out. This means the specs **will not run on CirlceCI** and it is imperative that **all specs be run locally and verified green before pushing commits on your branch or merging your branch to main**.
+The *run_tests* job in `.circleci/config.yml` will mock calls to HMPPS auth.  
+Running tests locally will perform these calls to the real auth service. You can also run the tests locally 
+with mocked calls: `MOCK_AUTH=1 bundle exec rspec`  
