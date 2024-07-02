@@ -1,4 +1,7 @@
 references:
+  ignore_deployable_branches: &ignore_deployable_branches
+    filters: { branches: { ignore: [ main, staging, preprod ] } }
+
   github_team_name_slug: &github_team_name_slug
     GITHUB_TEAM_NAME_SLUG: offender-management
 
@@ -207,7 +210,8 @@ jobs:
 workflows:
   build_and_test:
     jobs:
-      - install_dependencies
+      - install_dependencies:
+          <<: *ignore_deployable_branches
       - rubocop:
           requires:
             - install_dependencies
@@ -215,36 +219,21 @@ workflows:
           requires:
             - install_dependencies
       - hmpps/build_docker:
+          <<: *ignore_deployable_branches
           name: verify_docker_image
           publish: false
-          filters:
-            branches:
-              ignore:
-                - main
-                - preprod
       - hmpps/build_docker:
           name: build_and_push_image
           persist_container_image: true
-          requires:
-            - rubocop
-            - run_tests
-          filters:
-            branches:
-              only:
-                - main
-                - preprod
+          filters: { branches: { only: [ main, staging, preprod ] } }
       - deploy_staging:
           requires:
             - build_and_push_image
-          filters:
-            branches:
-              only: main
+          filters: { branches: { only: [ main, staging ] } }
       - deploy_preprod:
           requires:
             - build_and_push_image
-          filters:
-            branches:
-              only: main
+          filters: { branches: { only: [ main, preprod ] } }
       - deploy_production_approval:
           type: approval
           requires:
@@ -258,9 +247,3 @@ workflows:
           filters:
             branches:
               only: main
-      - deploy_preprod:
-          requires:
-            - build_and_push_image
-          filters:
-            branches:
-              only: preprod
