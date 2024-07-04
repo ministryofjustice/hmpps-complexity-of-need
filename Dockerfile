@@ -40,6 +40,10 @@ RUN \
   && gem update bundler --no-document \
   && apt-get clean
 
+RUN mkdir -p /home/appuser/.postgresql && \
+  curl https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+    > /home/appuser/.postgresql/root.crt
+
 COPY Gemfile* .ruby-version ./
 
 RUN bundle install --without development test --jobs 2 --retry 3
@@ -50,8 +54,7 @@ COPY . /app
 # This file is automatically used by Sentry to track releases
 RUN echo -n "$GIT_REF" > /app/RELEASE
 
-RUN mkdir -p /home/appuser && \
-  useradd appuser -u 1001 --user-group --home /home/appuser && \
+RUN useradd appuser -u 1001 --user-group --home /home/appuser && \
   chown -R appuser:appuser /app && \
   chown -R appuser:appuser /home/appuser
 

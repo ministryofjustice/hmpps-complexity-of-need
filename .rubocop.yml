@@ -34,3 +34,6 @@ Style/FrozenStringLiteralComment:
 
 RSpec/ExampleLength:
   Max: 11
+
+RSpec/IndexedLet:
+  Enabled: false

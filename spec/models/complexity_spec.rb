@@ -29,7 +29,7 @@ RSpec.describe Complexity, type: :model do
       data_type: "String",
     }
   end
-  let(:topic) { instance_double("topic", publish: nil) }
+  let(:topic) { instance_double(Aws::SNS::Topic, publish: nil) }
 
   before do
     allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)

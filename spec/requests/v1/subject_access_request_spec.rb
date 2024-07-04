@@ -5,7 +5,7 @@ require "shared_examples"
 
 RSpec.describe "Subject access request", type: :request do
   let(:response_json) { JSON.parse(response.body) }
-  let(:topic) { instance_double("topic", publish: nil) }
+  let(:topic) { instance_double(Aws::SNS::Topic, publish: nil) }
 
   let(:request_headers) do
     # Include an Authorization header to make the request valid
@@ -85,7 +85,7 @@ RSpec.describe "Subject access request", type: :request do
       end
 
       it "returns status 209" do
-        expect(response).to have_http_status "209" # rubocop:disable RSpecRails/HttpStatus
+        expect(response).to have_http_status "209"
       end
 
       it_behaves_like "returns an error response"
