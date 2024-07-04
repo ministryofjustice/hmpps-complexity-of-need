@@ -11,10 +11,14 @@ spec:
     spec:
       serviceAccountName: {{ with index .Values "generic-service" }}{{ .serviceAccountName }}{{ end }}
       restartPolicy: Never
+      securityContext:
+        {{- with index .Values "generic-service" }}{{ toYaml .podSecurityContext | nindent 8 }}{{ end }}
       containers:
       - name: hmpps-complexity-of-need-migration
         image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
         imagePullPolicy: Always
+        securityContext:
+          {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
         command: ['sh', '-c', 'bundle exec rails db:migrate && bundle exec rails db:seed']
           {{- include "deployment.envs" (index .Values "generic-service") | nindent 8 }}
         resources:

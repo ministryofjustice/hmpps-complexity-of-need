@@ -210,40 +210,48 @@ jobs:
 workflows:
   build_and_test:
     jobs:
-      - install_dependencies:
+#      - install_dependencies:
+#          <<: *ignore_deployable_branches
+#      - rubocop:
+#          requires:
+#            - install_dependencies
+#      - run_tests:
+#          requires:
+#            - install_dependencies
+      - hmpps/helm_lint:
           <<: *ignore_deployable_branches
-      - rubocop:
-          requires:
-            - install_dependencies
-      - run_tests:
-          requires:
-            - install_dependencies
-      - hmpps/build_docker:
-          <<: *ignore_deployable_branches
-          name: verify_docker_image
-          publish: false
+          name: helm_lint
+          env: staging
+#      - hmpps/build_docker:
+#          <<: *ignore_deployable_branches
+#          name: verify_docker_image
+#          publish: false
       - hmpps/build_docker:
           name: build_and_push_image
           persist_container_image: true
-          filters: { branches: { only: [ main, staging, preprod ] } }
-      - deploy_staging:
+          # filters: { branches: { only: [ main, staging, preprod ] } }
+      - hmpps/deploy_env:
+          name: deploy_staging
+          env: staging
+          context: hmpps-complexity-of-need-staging
           requires:
+            - helm_lint
             - build_and_push_image
-          filters: { branches: { only: [ main, staging ] } }
-      - deploy_preprod:
-          requires:
-            - build_and_push_image
-          filters: { branches: { only: [ main, preprod ] } }
-      - deploy_production_approval:
-          type: approval
-          requires:
-            - deploy_staging
-          filters:
-            branches:
-              only: main
-      - deploy_production:
-          requires:
-            - deploy_production_approval
-          filters:
-            branches:
-              only: main
+          # filters: { branches: { only: [ main, staging ] } }
+#      - deploy_preprod:
+#          requires:
+#            - build_and_push_image
+#          filters: { branches: { only: [ main, preprod ] } }
+#      - deploy_production_approval:
+#          type: approval
+#          requires:
+#            - deploy_staging
+#          filters:
+#            branches:
+#              only: main
+#      - deploy_production:
+#          requires:
+#            - deploy_production_approval
+#          filters:
+#            branches:
+#              only: main
