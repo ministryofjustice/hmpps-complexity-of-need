@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hmpps-complexity-of-need-migration
+spec:
+  ttlSecondsAfterFinished: 3600
+  completions: 1
+  parallelism: 1
+  backoffLimit: 4
+  template:
+    spec:
+      serviceAccountName: {{ with index .Values "generic-service" }}{{ .serviceAccountName }}{{ end }}
+      restartPolicy: Never
+      containers:
+      - name: hmpps-complexity-of-need-migration
+        image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
+        imagePullPolicy: Always
+        command: ['sh', '-c', 'bundle exec rails db:migrate && bundle exec rails db:seed']
+          {{- include "deployment.envs" (index .Values "generic-service") | nindent 8 }}
+        resources:
+          limits:
+            memory: 1Gi
+            cpu: 50m
+          requests:
+            memory: 1Gi
+            cpu: 30m

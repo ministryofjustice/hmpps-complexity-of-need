@@ -1,0 +1,11 @@
+---
+generic-service:
+  ingress:
+    hosts:
+      - complexity-of-need-staging.hmpps.service.justice.gov.uk
+    tlsSecretName: staging-cert
+
+  env:
+    SENTRY_CURRENT_ENV: staging
+    COMPLEXITY_OF_NEED_HOST: https://complexity-of-need-staging.hmpps.service.justice.gov.uk
+    NOMIS_OAUTH_HOST: https://sign-in-dev.hmpps.service.justice.gov.uk

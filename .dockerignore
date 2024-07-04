@@ -1,0 +1,15 @@
+Brewfile
+README.md
+.env*
+
+deploy/
+helm_deploy/
+log/
+tmp/
+coverage/
+vendor/bundle/
+.git/
+.bundle/
+.idea
+.github
+.git-crypt/
