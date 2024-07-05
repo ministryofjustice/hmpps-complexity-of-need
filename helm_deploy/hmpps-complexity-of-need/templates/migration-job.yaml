@@ -1,9 +1,9 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: hmpps-complexity-of-need-migration
+  name: rails-db-migration
 spec:
-  ttlSecondsAfterFinished: 3600
+  ttlSecondsAfterFinished: 120
   completions: 1
   parallelism: 1
   backoffLimit: 4
@@ -23,8 +23,8 @@ spec:
           {{- include "deployment.envs" (index .Values "generic-service") | nindent 8 }}
         resources:
           limits:
-            memory: 1Gi
-            cpu: 50m
+            memory: 1000Mi
+            cpu: 1000m
           requests:
-            memory: 1Gi
-            cpu: 30m
+            memory: 500Mi
+            cpu: 50m
