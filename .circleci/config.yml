@@ -2,19 +2,6 @@ references:
   ignore_deployable_branches: &ignore_deployable_branches
     filters: { branches: { ignore: [ main, staging, preprod ] } }
 
-  github_team_name_slug: &github_team_name_slug
-    GITHUB_TEAM_NAME_SLUG: offender-management
-
-  deploy_container_config: &deploy_container_config
-    working_directory: ~/app
-    resource_class: small
-    docker:
-      - image: ministryofjustice/cloud-platform-tools
-        environment:
-          KUBE_ENV_STAGING_NAMESPACE: hmpps-complexity-of-need-staging
-          KUBE_ENV_PREPROD_NAMESPACE: hmpps-complexity-of-need-preprod
-          KUBE_ENV_PRODUCTION_NAMESPACE: hmpps-complexity-of-need-production
-
   test_container_config: &test_container_config
     working_directory: ~/app
     resource_class: small
@@ -34,43 +21,6 @@ references:
           POSTGRES_USER: ubuntu
           POSTGRES_PASSWORD: ""
           POSTGRES_DB: hmpps_complexity_of_need_test
-
-  install_gpg: &install_gpg
-    run:
-      name: Install GPG
-      command: |
-        apk add \
-          --no-cache \
-          --no-progress \
-          gnupg
-
-  configure_gpg: &configure_gpg
-    run:
-      name: Configure GPG
-      command: |
-        echo "${GPG_PRIVATE_KEY}" | base64 -d | gpg --batch --allow-secret-key-import --import
-
-  decrypt_secrets: &decrypt_secrets
-    run:
-      name: Decrypt secrets file
-      command: |
-        gpg --export-ownertrust > /tmp/ownertrust.txt
-        echo $GPG_KEY_ID:1 >> /tmp/ownertrust.txt
-        gpg --import-ownertrust /tmp/ownertrust.txt
-        gpgconf --kill gpg-agent
-        gpg-agent --daemon --allow-preset-passphrase
-        /usr/libexec/gpg-preset-passphrase --preset --passphrase $GPG_PASSPHRASE $GPG_KEY_KEYGRIP_ID
-        git-crypt unlock
-
-  install_yq: &install_yq
-    run:
-      name: Install yq (YAML parser)
-      command: |
-        wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - |\
-        tar xz && mv ${BINARY} /usr/bin/yq
-      environment:
-        VERSION: v4.6.3
-        BINARY: yq_linux_amd64
 
 version: 2.1
 
@@ -101,111 +51,6 @@ jobs:
           name: Security analysis
           command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - ruby/rspec-test
-
-  deploy_staging:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Kubectl deployment to live cluster staging setup
-          command: |
-            echo -n ${CLUSTER_LIVE_CERT} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${LIVE_STAGING_TOKEN}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_STAGING_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_STAGING_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - *install_yq
-      - hmpps/recall_container_image
-      - run:
-          name: Deploy to staging
-          command: |
-            kubectl delete job hmpps-complexity-of-need-migration --ignore-not-found
-            sed -i -e s/:latest/:${APP_VERSION}/ deploy/staging/deployment.yaml
-            sed -i -e s/:latest/:${APP_VERSION}/ deploy/staging/migration-job.yaml
-            kubectl apply -f ./deploy/staging
-            kubectl annotate deployments/hmpps-complexity-of-need kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-          environment:
-            <<: *github_team_name_slug
-      - run:
-          name: Wait for Kube to spin up new pods
-          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_STAGING_NAMESPACE" "hmpps-complexity-of-need" "${APP_VERSION}"
-
-  deploy_preprod:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Kubectl deployment preprod setup
-          command: |
-            echo -n ${CLUSTER_LIVE_CERT} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${LIVE_PREPROD_TOKEN}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_PREPROD_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_PREPROD_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - *install_yq
-      - hmpps/recall_container_image
-      - run:
-          name: Deploy to pre-production
-          command: |
-            kubectl delete job rails-db-migration --ignore-not-found
-            sed -i -e s/:latest/:${APP_VERSION}/ deploy/preprod/deployment.yaml
-            sed -i -e s/:latest/:${APP_VERSION}/ deploy/preprod/migration-job.yaml
-            kubectl apply -f ./deploy/preprod
-            kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-          environment:
-            <<: *github_team_name_slug
-      - run:
-          name: Wait for Kube to spin up new pods
-          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_PREPROD_NAMESPACE" "hmpps-complexity-of-need" "${APP_VERSION}"
-
-  deploy_production:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Kubectl deployment production setup
-          command: |
-            echo -n ${CLUSTER_LIVE_CERT} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${CLUSTER_NAME_LIVE} --certificate-authority=./live_ca.crt --server=https://${CLUSTER_NAME_LIVE}
-            kubectl config set-credentials circleci --token=${LIVE_PRODUCTION_TOKEN}
-            kubectl config set-context ${CLUSTER_NAME_LIVE} --cluster=${CLUSTER_NAME_LIVE} --user=circleci --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE}
-            kubectl config use-context ${CLUSTER_NAME_LIVE}
-            kubectl config current-context
-            kubectl --namespace=${KUBE_ENV_PRODUCTION_NAMESPACE} get pods
-      - *install_gpg
-      - *configure_gpg
-      - *decrypt_secrets
-      - *install_yq
-      - hmpps/recall_container_image
-      - run:
-          name: Deploy to production
-          command: |
-            kubectl delete job rails-db-migration --ignore-not-found
-            sed -i -e s/:latest/:${APP_VERSION}/ deploy/production/deployment.yaml
-            sed -i -e s/:latest/:${APP_VERSION}/ deploy/production/migration-job.yaml
-            kubectl apply -f ./deploy/production
-            kubectl annotate deployments/app-deployment kubernetes.io/change-cause="$CIRCLE_BUILD_URL"
-          environment:
-            <<: *github_team_name_slug
-      - run:
-          name: Wait for Kube to spin up new pods
-          command: bash .circleci/wait-for-successful-deployment.sh "$KUBE_ENV_PRODUCTION_NAMESPACE" "hmpps-complexity-of-need" "${APP_VERSION}"
 
 workflows:
   build_and_test:
@@ -246,16 +91,14 @@ workflows:
             - helm_lint
             - build_and_push_image
           # filters: { branches: { only: [ main, preprod ] } }
-#      - deploy_production_approval:
-#          type: approval
-#          requires:
-#            - deploy_staging
-#          filters:
-#            branches:
-#              only: main
-#      - deploy_production:
-#          requires:
-#            - deploy_production_approval
-#          filters:
-#            branches:
-#              only: main
+      - deploy_production_approval:
+          type: approval
+          requires:
+            - deploy_staging
+          # filters: { branches: { only: [ main ] } }
+      - hmpps/deploy_env:
+          name: deploy_production
+          env: production
+          context: hmpps-complexity-of-need-production
+          requires:
+            - deploy_production_approval
