@@ -78,7 +78,9 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_staging
           env: staging
-          context: hmpps-complexity-of-need-staging
+          context:
+            - hmpps-common-vars
+            - hmpps-complexity-of-need-staging
           requires:
             - helm_lint
             - build_and_push_image
@@ -86,7 +88,9 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_preprod
           env: preprod
-          context: hmpps-complexity-of-need-preprod
+          context:
+            - hmpps-common-vars
+            - hmpps-complexity-of-need-preprod
           requires:
             - helm_lint
             - build_and_push_image
@@ -99,6 +103,8 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_production
           env: production
-          context: hmpps-complexity-of-need-production
+          context:
+            - hmpps-common-vars
+            - hmpps-complexity-of-need-production
           requires:
             - deploy_production_approval

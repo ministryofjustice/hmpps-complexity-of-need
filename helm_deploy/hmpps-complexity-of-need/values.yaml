@@ -26,7 +26,9 @@ generic-service:
 
   # https://github.com/ministryofjustice/hmpps-ip-allowlists/blob/main/ip-allowlist-groups.yaml
   allowlist:
-    custom-1: "35.178.209.113/32,3.8.51.207/32,35.177.252.54/32,35.176.93.186/32"
+    global-protect-3: "35.176.93.186/32"
+    groups:
+      - moj_cloud_platform
 
   livenessProbe:
     httpGet:
