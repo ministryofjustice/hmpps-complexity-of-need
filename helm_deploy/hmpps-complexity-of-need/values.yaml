@@ -15,13 +15,20 @@ generic-service:
 
   image:
     repository: quay.io/hmpps/hmpps-complexity-of-need
+    tag: app_version # overridden at deployment time
     port: 3000
 
   service:
     port: 3000
 
   ingress:
-    enabled: false
+    enabled: true
+
+  # https://github.com/ministryofjustice/hmpps-ip-allowlists/blob/main/ip-allowlist-groups.yaml
+  allowlist:
+    global-protect-3: 35.176.93.186/32
+    groups:
+      - moj_cloud_platform
 
   livenessProbe:
     httpGet:
