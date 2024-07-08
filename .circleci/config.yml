@@ -238,10 +238,14 @@ workflows:
             - helm_lint
             - build_and_push_image
           # filters: { branches: { only: [ main, staging ] } }
-#      - deploy_preprod:
-#          requires:
-#            - build_and_push_image
-#          filters: { branches: { only: [ main, preprod ] } }
+      - hmpps/deploy_env:
+          name: deploy_preprod
+          env: preprod
+          context: hmpps-complexity-of-need-preprod
+          requires:
+            - helm_lint
+            - build_and_push_image
+          # filters: { branches: { only: [ main, preprod ] } }
 #      - deploy_production_approval:
 #          type: approval
 #          requires:
