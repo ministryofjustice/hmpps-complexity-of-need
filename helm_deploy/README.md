@@ -11,6 +11,8 @@ and are common to any deploy environment (staging, preprod, production...)
 
 1. `KUBE_ENV_API` with value `https://DF366E49809688A3B16EEC29707D8C09.gr7.eu-west-2.eks.amazonaws.com`
 2. `KUBE_ENV_NAME` with value `DF366E49809688A3B16EEC29707D8C09.gr7.eu-west-2.eks.amazonaws.com`
+3. `QUAYIO_USERNAME` (ask a team colleague if you don't have it)
+4. `QUAYIO_PASSWORD` (ask a team colleague if you don't have it)
 
 __Namespace-dependent variables__
 
