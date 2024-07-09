@@ -55,26 +55,27 @@ jobs:
 workflows:
   build_and_test:
     jobs:
-#      - install_dependencies:
-#          <<: *ignore_deployable_branches
-#      - rubocop:
-#          requires:
-#            - install_dependencies
-#      - run_tests:
-#          requires:
-#            - install_dependencies
+      - install_dependencies:
+          <<: *ignore_deployable_branches
+      - rubocop:
+          requires:
+            - install_dependencies
+      - run_tests:
+          requires:
+            - install_dependencies
       - hmpps/helm_lint:
           <<: *ignore_deployable_branches
           name: helm_lint
           env: staging
-#      - hmpps/build_docker:
-#          <<: *ignore_deployable_branches
-#          name: verify_docker_image
-#          publish: false
+      - hmpps/build_docker:
+          name: verify_docker_image
+          publish: false
+          requires:
+            - helm_lint
       - hmpps/build_docker:
           name: build_and_push_image
           persist_container_image: true
-          # filters: { branches: { only: [ main, staging, preprod ] } }
+          filters: { branches: { only: [ main, staging, preprod ] } }
       - hmpps/deploy_env:
           name: deploy_staging
           env: staging
@@ -82,9 +83,8 @@ workflows:
             - hmpps-common-vars
             - hmpps-complexity-of-need-staging
           requires:
-            - helm_lint
             - build_and_push_image
-          # filters: { branches: { only: [ main, staging ] } }
+          filters: { branches: { only: [ main, staging ] } }
       - hmpps/deploy_env:
           name: deploy_preprod
           env: preprod
@@ -92,14 +92,13 @@ workflows:
             - hmpps-common-vars
             - hmpps-complexity-of-need-preprod
           requires:
-            - helm_lint
             - build_and_push_image
-          # filters: { branches: { only: [ main, preprod ] } }
+          filters: { branches: { only: [ main, preprod ] } }
       - deploy_production_approval:
           type: approval
           requires:
             - deploy_staging
-          # filters: { branches: { only: [ main ] } }
+          filters: { branches: { only: [ main ] } }
       - hmpps/deploy_env:
           name: deploy_production
           env: production
@@ -108,3 +107,5 @@ workflows:
             - hmpps-complexity-of-need-production
           requires:
             - deploy_production_approval
+          slack_notification: true
+          slack_channel_name: the_elephants_devs
