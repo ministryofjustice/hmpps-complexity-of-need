@@ -2,7 +2,6 @@ Brewfile
 README.md
 .env*
 
-deploy/
 helm_deploy/
 log/
 tmp/
@@ -12,4 +11,3 @@ vendor/bundle/
 .bundle/
 .idea
 .github
-.git-crypt/
