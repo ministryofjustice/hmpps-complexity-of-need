@@ -35,6 +35,7 @@ end
 RSpec.configure do |config|
   config.example_status_persistence_file_path = 'tmp/example_status.txt'
 
+  config.include ActiveSupport::Testing::TimeHelpers
   config.include FactoryBot::Syntax::Methods
   config.include AuthHelper
 

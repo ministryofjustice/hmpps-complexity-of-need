@@ -5,8 +5,6 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby File.read(".ruby-version").chomp
 
-# Reduces boot times through caching; required in config/boot.rb
-gem "bootsnap", ">= 1.4.4", require: false
 gem "faraday"
 
 # these default gems will be removed in ruby 3.4
@@ -23,7 +21,7 @@ gem "pg", "~> 1.1"
 gem "puma", "~> 5.6"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
-gem "rails", "~> 6.1.5"
+gem "rails", "~> 7.0.0"
 gem "responders"
 gem "rswag-api"
 gem "rswag-ui"
@@ -49,7 +47,6 @@ group :development, :test do
   gem "rubocop-performance"
   gem "rubocop-rails"
   gem "rubocop-rspec"
-  gem "timecop"
 end
 
 group :development do

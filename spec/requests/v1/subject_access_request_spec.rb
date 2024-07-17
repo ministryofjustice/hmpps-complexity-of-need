@@ -174,7 +174,7 @@ RSpec.describe "Subject access request", type: :request do
     context "when the client's token has expired" do
       before do
         # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
+        travel_to(Time.zone.today + 1.year) do
           get endpoint, headers: request_headers
         end
       end

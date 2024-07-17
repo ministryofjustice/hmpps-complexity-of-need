@@ -125,7 +125,7 @@ RSpec.describe "Complexities", type: :request do
     context "when the client's token has expired" do
       before do
         # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
+        travel_to(Time.zone.today + 1.year) do
           stub_expired_access_token
           get endpoint, headers: request_headers
         end
@@ -261,7 +261,7 @@ RSpec.describe "Complexities", type: :request do
     context "when the client's token has expired" do
       before do
         # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
+        travel_to(Time.zone.today + 1.year) do
           stub_expired_access_token
           post endpoint, headers: request_headers
         end
@@ -394,7 +394,7 @@ RSpec.describe "Complexities", type: :request do
     context "when the client's token has expired" do
       before do
         # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
+        travel_to(Time.zone.today + 1.year) do
           stub_expired_access_token
           post endpoint, headers: request_headers
         end
@@ -516,7 +516,7 @@ RSpec.describe "Complexities", type: :request do
 
       before do
         # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
+        travel_to(Time.zone.today + 1.year) do
           stub_expired_access_token
           get endpoint, headers: request_headers
         end
@@ -577,7 +577,7 @@ RSpec.describe "Complexities", type: :request do
     context "when the client's token has expired" do
       before do
         # Travel into the future to expire the access token
-        Timecop.travel(Time.zone.today + 1.year) do
+        travel_to(Time.zone.today + 1.year) do
           stub_expired_access_token
           put endpoint, headers: request_headers
         end

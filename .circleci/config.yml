@@ -64,10 +64,10 @@ workflows:
           requires:
             - install_dependencies
       - hmpps/helm_lint:
-          <<: *ignore_deployable_branches
           name: helm_lint
           env: staging
       - hmpps/build_docker:
+          <<: *ignore_deployable_branches
           name: verify_docker_image
           publish: false
           requires:
@@ -75,6 +75,8 @@ workflows:
       - hmpps/build_docker:
           name: build_and_push_image
           persist_container_image: true
+          requires:
+            - helm_lint
           filters: { branches: { only: [ main, staging, preprod ] } }
       - hmpps/deploy_env:
           name: deploy_staging
