@@ -5,35 +5,29 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby File.read(".ruby-version").chomp
 
-gem "faraday"
+gem "rails", "~> 7.1.3"
 
 # these default gems will be removed in ruby 3.4
 gem "drb"
 gem "mutex_m"
 
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem "aws-sdk-sns"
+gem "faraday"
 gem "jbuilder", "~> 2.7"
 gem "jwt"
-
-# Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
-# Use Puma as the app server
-gem "puma", "~> 5.6"
-
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
-gem "rails", "~> 7.0.0"
+gem "puma", "~> 6.0"
 gem "responders"
 gem "rswag-api"
 gem "rswag-ui"
-
-gem "aws-sdk-sns"
 
 # Sentry error reporting
 gem "sentry-rails"
 gem "sentry-ruby"
 
-# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
-# gem 'rack-cors'
+# Logging
+gem "lograge"
+gem "logstash-event"
 
 group :development, :test do
   gem "brakeman"
@@ -47,9 +41,6 @@ group :development, :test do
   gem "rubocop-performance"
   gem "rubocop-rails"
   gem "rubocop-rspec"
-end
-
-group :development do
 end
 
 group :test do

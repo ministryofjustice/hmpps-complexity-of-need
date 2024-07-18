@@ -58,7 +58,6 @@ generic-service:
   # Environment variables to load into the deployment
   env:
     RAILS_ENV: production
-    RAILS_LOG_TO_STDOUT: on
     LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.

@@ -6,4 +6,5 @@ Sentry.init do |config|
   # so no need to configure them here
 
   config.breadcrumbs_logger = [:active_support_logger]
+  config.release = ENV["BUILD_NUMBER"]
 end
