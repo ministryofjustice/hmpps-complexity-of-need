@@ -81,9 +81,6 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_staging
           env: staging
-          context:
-            - hmpps-common-vars
-            - hmpps-complexity-of-need-staging
           requires:
             - build_and_push_image
           filters: { branches: { only: [ main, staging ] } }
@@ -91,7 +88,6 @@ workflows:
           name: deploy_preprod
           env: preprod
           context:
-            - hmpps-common-vars
             - hmpps-complexity-of-need-preprod
           requires:
             - build_and_push_image
