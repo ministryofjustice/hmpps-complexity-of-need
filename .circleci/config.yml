@@ -81,6 +81,8 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_staging
           env: staging
+          context:
+            - hmpps-common-vars # needed to fetch the ip-allowlist-groups
           requires:
             - build_and_push_image
           filters: { branches: { only: [ main, staging ] } }
@@ -88,6 +90,7 @@ workflows:
           name: deploy_preprod
           env: preprod
           context:
+            - hmpps-common-vars # needed to fetch the ip-allowlist-groups
             - hmpps-complexity-of-need-preprod
           requires:
             - build_and_push_image
@@ -101,7 +104,7 @@ workflows:
           name: deploy_production
           env: production
           context:
-            - hmpps-common-vars
+            - hmpps-common-vars # needed to fetch the ip-allowlist-groups, and slack notification
             - hmpps-complexity-of-need-production
           requires:
             - deploy_production_approval
