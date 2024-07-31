@@ -21,6 +21,9 @@ gem "responders"
 gem "rswag-api"
 gem "rswag-ui"
 
+# Microsoft Application Insights
+gem "application_insights"
+
 # Sentry error reporting
 gem "sentry-rails"
 gem "sentry-ruby"
