@@ -4,6 +4,13 @@
 #
 # Variables in `helm_deploy/values-[env].yaml` will take precedence.
 
+generic-prometheus-alerts:
+  targetApplication: hmpps-complexity-of-need
+  alertSeverity: moic
+  hpaTargetOverride: ".*"
+  podTargetOverride: ".*"
+  deploymentTargetOverride: ".*"
+
 generic-service:
   replicaCount: 2
 

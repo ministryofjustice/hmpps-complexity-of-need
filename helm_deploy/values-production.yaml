@@ -1,4 +1,8 @@
 ---
+generic-prometheus-alerts:
+  rdsAlertsDatabases:
+    cloud-platform-caf2be118f45c7ce: production
+
 generic-service:
   ingress:
     hosts:
