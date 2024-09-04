@@ -15,7 +15,7 @@ RSpec.configure do |config|
   # document below. You can override this behavior by adding a swagger_doc tag to the
   # the root example_group in your specs, e.g. describe '...', swagger_doc: 'v2/swagger.json'
   config.openapi_specs = {
-    "v1/swagger.yaml" => {
+    "v1/swagger.json" => {
       openapi: "3.0.1",
       info: {
         title: "Complexity of Need API",
@@ -31,6 +31,8 @@ RSpec.configure do |config|
 
           Write permissions are granted to clients with the role `ROLE_UPDATE_COMPLEXITY_OF_NEED`.
 
+          To use the SAR API, clients will need the role `ROLE_SAR_DATA_ACCESS`.
+
           ---
 
           Owned by the **Manage POM Cases** team
@@ -45,6 +47,12 @@ RSpec.configure do |config|
       security: [HmppsAuth: %w[read]], # Require a valid HMPPS Auth token with "read" scope
       components: {
         securitySchemes: {
+          Bearer: {
+            type: "apiKey",
+            description: "A bearer token obtained from HMPPS SSO",
+            name: "Authorization",
+            in: "header",
+          },
           HmppsAuth: {
             type: :oauth2,
             # HMPPS Auth uses the 'client credentials' oAuth 2 flow: https://swagger.io/docs/specification/authentication/oauth2/
@@ -100,7 +108,7 @@ RSpec.configure do |config|
                 description: "Whether it is active or not",
               },
             },
-            required: %w[offenderNo level createdTimeStamp sourceSystem],
+            required: %w[offenderNo level createdTimeStamp sourceSystem active],
             additionalProperties: false,
           },
           NewComplexityOfNeed: {
@@ -119,6 +127,26 @@ RSpec.configure do |config|
             },
             required: %w[level],
             additionalProperties: false,
+          },
+          SarError: {
+            required: %w[developerMessage errorCode status userMessage],
+            type: :object,
+            properties: {
+              developerMessage: { type: :string },
+              errorCode: { type: :integer },
+              status: { type: :integer },
+              userMessage: { type: :string },
+            },
+          },
+          SarOffenderData: {
+            required: %w[content],
+            type: :object,
+            properties: {
+              content: {
+                type: :array,
+                items: { "$ref" => "#/components/schemas/ComplexityOfNeed" },
+              },
+            },
           },
         },
       },
@@ -154,5 +182,5 @@ RSpec.configure do |config|
   # The openapi_docs configuration option has the filename including format in
   # the key, this may want to be changed to avoid putting yaml in json files.
   # Defaults to json. Accepts ':json' and ':yaml'.
-  config.openapi_format = :yaml
+  config.openapi_format = :json
 end

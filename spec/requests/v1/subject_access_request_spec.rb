@@ -16,8 +16,8 @@ RSpec.describe "Subject access request", type: :request do
     allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
   end
 
-  describe "GET /subject-access-request" do
-    let(:endpoint) { "/subject-access-request" }
+  describe "GET /v1/subject-access-request" do
+    let(:endpoint) { "/v1/subject-access-request" }
     let(:get_body) { {} }
 
     let(:time1) { Time.zone.now - 3.days }
@@ -25,9 +25,9 @@ RSpec.describe "Subject access request", type: :request do
     let(:time3) { Time.zone.now - 1.day }
 
     let(:offender_no) { "A000BC" }
-    let!(:complexity1) { create(:complexity, offender_no:, created_at: time1, active: true) }
-    let!(:complexity2) { create(:complexity, offender_no:, created_at: time2, active: false) }
-    let!(:complexity3) { create(:complexity, offender_no:, created_at: time3, active: true) }
+    let!(:complexity1) { create(:complexity, :with_user, :with_notes, offender_no:, created_at: time1, active: true) }
+    let!(:complexity2) { create(:complexity, :with_user, :with_notes, offender_no:, created_at: time2, active: false) }
+    let!(:complexity3) { create(:complexity, :with_user, :with_notes, offender_no:, created_at: time3, active: true) }
 
     shared_context "with mocked token" do
       before do
@@ -131,8 +131,8 @@ RSpec.describe "Subject access request", type: :request do
       let(:get_body) do
         {
           prn: offender_no,
-          fromDate: time1.to_date,
-          toDate: time2.to_date,
+          fromDate: time1.to_date.to_s,
+          toDate: time2.to_date.to_s,
         }
       end
 
@@ -149,7 +149,7 @@ RSpec.describe "Subject access request", type: :request do
         get endpoint, headers: request_headers
       end
 
-      include_examples "HTTP 403 Forbidden", "You need the role 'ROLE_SAR_DATA_ACCESS' to use this endpoint"
+      include_examples "SAR HTTP 403 Forbidden", "You need the role 'ROLE_SAR_DATA_ACCESS' to use this endpoint"
 
       context "with the role ROLE_CNL_ADMIN" do # rubocop:disable RSpec/NestedGroups
         before do
@@ -168,7 +168,7 @@ RSpec.describe "Subject access request", type: :request do
         get endpoint # don't include an Authorization header
       end
 
-      include_examples "HTTP 401 Unauthorized"
+      include_examples "SAR HTTP 401 Unauthorized"
     end
 
     context "when the client's token has expired" do
@@ -179,7 +179,7 @@ RSpec.describe "Subject access request", type: :request do
         end
       end
 
-      include_examples "HTTP 401 Unauthorized"
+      include_examples "SAR HTTP 401 Unauthorized"
     end
   end
 end

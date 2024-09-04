@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   mount Rswag::Ui::Engine => "/api-docs"
   mount Rswag::Api::Engine => "/api-docs"
 
+  # Following paths are expected by other services/teams, do not change!
+  get "/swagger-ui.html", to: redirect("/api-docs")
+  get "/v3/api-docs", to: redirect("/api-docs/v1/swagger.json")
+
   get "/ping" => "health#index"
   get "/health" => "health#index"
   get "/info" => "info#index"
@@ -18,8 +22,9 @@ Rails.application.routes.draw do
       post "/complexity-of-need/multiple/offender-no" => "complexities#multiple"
       get "/complexity-of-need/offender-no/:offender_no/history" => "complexities#history"
       put "/complexity-of-need/offender-no/:offender_no/inactivate" => "complexities#inactivate"
-    end
 
-    get "/subject-access-request" => "subject_access_request#show"
+      # SAR API
+      get "/subject-access-request" => "subject_access_request#show"
+    end
   end
 end

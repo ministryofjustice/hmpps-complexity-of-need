@@ -7,32 +7,52 @@ class SubjectAccessRequestController < ApplicationController
   before_action :authorise_sar!
 
   def show
-    return multiple_identifiers if params[:prn].present? && params[:crn].present?
-    return wrong_identifier if params[:crn].present?
+    return render_error("Cannot supply both CRN and PRN", 2, 400) if params[:prn].present? && params[:crn].present?
+    return render_error("CRN parameter not allowed", 3, 209) if params[:crn].present?
+    return render_error("Invalid date format", 4, 210) unless parse_dates
 
     @complexities = Complexity.where(offender_no: params[:prn]).order(created_at: :asc)
     return not_found if @complexities.none?
 
-    if params[:fromDate].present? && params[:toDate].present?
-      @complexities = @complexities.where("DATE(created_at) BETWEEN ? AND ?",
-                                          Date.parse(params[:fromDate]),
-                                          Date.parse(params[:toDate]))
+    if @from_date && @to_date
+      @complexities = @complexities.where("DATE(created_at) BETWEEN ? AND ?", @from_date, @to_date)
     end
   end
 
 private
 
+  def parse_dates
+    if params[:fromDate].blank? || params[:toDate].blank?
+      @from_date = nil
+      @to_date = nil
+    else
+      @from_date = Date.parse(params[:fromDate])
+      @to_date = Date.parse(params[:toDate])
+    end
+
+    true
+  rescue Date::Error
+    false
+  end
+
   def not_found
     head :no_content
   end
 
-  def multiple_identifiers
-    message = "Cannot supply both CRN and PRN"
-    render json: { developerMessage: message, errorCode: 1, status: 400, userMessage: message }, status: :bad_request
+  def render_bad_token
+    render_error("Missing or invalid access token", 1, 401)
   end
 
-  def wrong_identifier
-    message = "Must supply PRN"
-    render json: { developerMessage: message, errorCode: 2, status: 209, userMessage: message }, status: "209" # rubocop:disable Rails/HttpStatus
+  def render_forbidden(message)
+    render_error(message, 5, 403)
+  end
+
+  def render_error(msg, error_code, status)
+    render json: {
+      developerMessage: msg,
+      errorCode: error_code,
+      status:,
+      userMessage: msg,
+    }, status:
   end
 end
