@@ -16,8 +16,8 @@ RSpec.describe "Subject access request", type: :request do
     allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
   end
 
-  describe "GET /v1/subject-access-request" do
-    let(:endpoint) { "/v1/subject-access-request" }
+  describe "GET /subject-access-request" do
+    let(:endpoint) { "/subject-access-request" }
     let(:get_body) { {} }
 
     let(:time1) { Time.zone.now - 3.days }

@@ -168,7 +168,7 @@
     }
   ],
   "paths": {
-    "/complexity-of-need/offender-no/{offender_no}": {
+    "/v1/complexity-of-need/offender-no/{offender_no}": {
       "parameters": [
         {
           "name": "offender_no",
@@ -249,7 +249,7 @@
         }
       }
     },
-    "/complexity-of-need/multiple/offender-no": {
+    "/v1/complexity-of-need/multiple/offender-no": {
       "post": {
         "summary": "Retrieve the current Complexity of Need levels for multiple offenders",
         "tags": [
@@ -303,7 +303,7 @@
         }
       }
     },
-    "/complexity-of-need/offender-no/{offender_no}/history": {
+    "/v1/complexity-of-need/offender-no/{offender_no}/history": {
       "parameters": [
         {
           "name": "offender_no",
@@ -348,7 +348,7 @@
         }
       }
     },
-    "/complexity-of-need/offender-no/{offender_no}/inactivate": {
+    "/v1/complexity-of-need/offender-no/{offender_no}/inactivate": {
       "parameters": [
         {
           "name": "offender_no",
@@ -555,15 +555,15 @@
   },
   "servers": [
     {
-      "url": "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1",
+      "url": "https://complexity-of-need-staging.hmpps.service.justice.gov.uk",
       "description": "Staging/dev environment"
     },
     {
-      "url": "https://complexity-of-need-preprod.hmpps.service.justice.gov.uk/v1",
+      "url": "https://complexity-of-need-preprod.hmpps.service.justice.gov.uk",
       "description": "Pre-production environment"
     },
     {
-      "url": "https://complexity-of-need.hmpps.service.justice.gov.uk/v1",
+      "url": "https://complexity-of-need.hmpps.service.justice.gov.uk",
       "description": "Production environment"
     }
   ]

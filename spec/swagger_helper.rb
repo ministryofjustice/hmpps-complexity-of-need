@@ -163,15 +163,15 @@ RSpec.configure do |config|
       paths: {},
       servers: [
         {
-          url: "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1",
+          url: "https://complexity-of-need-staging.hmpps.service.justice.gov.uk",
           description: "Staging/dev environment",
         },
         {
-          url: "https://complexity-of-need-preprod.hmpps.service.justice.gov.uk/v1",
+          url: "https://complexity-of-need-preprod.hmpps.service.justice.gov.uk",
           description: "Pre-production environment",
         },
         {
-          url: "https://complexity-of-need.hmpps.service.justice.gov.uk/v1",
+          url: "https://complexity-of-need.hmpps.service.justice.gov.uk",
           description: "Production environment",
         },
       ],

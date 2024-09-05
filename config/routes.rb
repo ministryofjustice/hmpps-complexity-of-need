@@ -23,9 +23,8 @@ Rails.application.routes.draw do
       post "/complexity-of-need/multiple/offender-no" => "complexities#multiple"
       get "/complexity-of-need/offender-no/:offender_no/history" => "complexities#history"
       put "/complexity-of-need/offender-no/:offender_no/inactivate" => "complexities#inactivate"
-
-      # SAR API
-      get "/subject-access-request" => "subject_access_request#show"
     end
+
+    get "/subject-access-request" => "subject_access_request#show"
   end
 end

@@ -17,7 +17,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.json" do
     allow(ComplexityEventService).to receive(:sns_topic).and_return(topic)
   end
 
-  path "/complexity-of-need/offender-no/{offender_no}" do
+  path "/v1/complexity-of-need/offender-no/{offender_no}" do
     parameter name: :offender_no, in: :path, type: :string,
               description: "NOMIS Offender Number", example: "A0000AA"
 
@@ -99,7 +99,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.json" do
     end
   end
 
-  path "/complexity-of-need/multiple/offender-no" do
+  path "/v1/complexity-of-need/multiple/offender-no" do
     before do
       stub_access_token roles: %w[ROLE_COMPLEXITY_OF_NEED]
     end
@@ -151,7 +151,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.json" do
     end
   end
 
-  path "/complexity-of-need/offender-no/{offender_no}/history" do
+  path "/v1/complexity-of-need/offender-no/{offender_no}/history" do
     parameter name: :offender_no, in: :path, type: :string,
               description: "NOMIS Offender Number", example: "A0000AA"
 
@@ -196,7 +196,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.json" do
     end
   end
 
-  path "/complexity-of-need/offender-no/{offender_no}/inactivate" do
+  path "/v1/complexity-of-need/offender-no/{offender_no}/inactivate" do
     parameter name: :offender_no, in: :path, type: :string,
               description: "NOMIS Offender Number", example: "A0000AA"
 
