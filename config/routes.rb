@@ -6,8 +6,9 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => "/api-docs"
 
   # Following paths are expected by other services/teams, do not change!
-  get "/swagger-ui.html", to: redirect("/api-docs")
-  get "/v3/api-docs", to: redirect("/api-docs/v1/swagger.json")
+  # The HMPPS script that deals with API discoverability has some strict conventions
+  get "/swagger-ui.html", to: redirect("/api-docs/index.html", status: 302)
+  get "/v3/api-docs", to: "swagger_docs#index"
 
   get "/ping" => "health#index"
   get "/health" => "health#index"
