@@ -151,7 +151,7 @@ RSpec.describe "Subject access request", type: :request do
 
       include_examples "SAR HTTP 403 Forbidden", "You need the role 'ROLE_SAR_DATA_ACCESS' to use this endpoint"
 
-      context "with the role ROLE_CNL_ADMIN" do # rubocop:disable RSpec/NestedGroups
+      context "with the role ROLE_CNL_ADMIN" do
         before do
           stub_access_token roles: %w[ROLE_CNL_ADMIN]
           get endpoint, headers: request_headers, params: { prn: offender_no }

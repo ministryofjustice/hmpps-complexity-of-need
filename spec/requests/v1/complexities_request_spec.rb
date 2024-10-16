@@ -94,7 +94,6 @@ RSpec.describe "Complexities", type: :request do
                                active: most_recent.active)
       end
 
-      # rubocop:disable RSpec/NestedGroups
       context "with the latest complexity inactive" do
         let(:most_recent_active_status) { false }
 
@@ -102,7 +101,6 @@ RSpec.describe "Complexities", type: :request do
           expect(response).to have_http_status :not_found
         end
       end
-      # rubocop:enable RSpec/NestedGroups
     end
 
     context "when the client doesn't have the necessary role" do
@@ -473,7 +471,6 @@ RSpec.describe "Complexities", type: :request do
         end
       end
 
-      # rubocop:disable RSpec/NestedGroups
       context "with some inactivated" do
         let(:some_inactive) { true }
 
@@ -487,7 +484,6 @@ RSpec.describe "Complexities", type: :request do
           end
         end
       end
-      # rubocop:enable RSpec/NestedGroups
     end
 
     context "when the client doesn't have the necessary role" do
