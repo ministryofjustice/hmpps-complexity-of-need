@@ -6,6 +6,14 @@ RSpec.describe "Health", type: :request do
   let(:build_number) { "2014-12-25.52422.e70d4e2" }
   let(:git_ref) { "e70d4e2" }
 
+  describe "GET /ping" do
+    it "says pong" do
+      get "/ping"
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to eq("pong")
+    end
+  end
+
   describe "GET /health/ping" do
     it "says pong" do
       get "/health/ping"
