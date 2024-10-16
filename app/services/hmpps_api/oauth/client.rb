@@ -14,16 +14,23 @@ module HmppsApi
         request(:post, route)
       end
 
+      # Performs a basic GET request without processing the response. This is mostly
+      # used for when we do not want a JSON response from an endpoint.
+      # Currently used in the `health` endpoint.
+      def raw_get(route)
+        request(:get, route, parse: false)
+      end
+
     private
 
-      def request(method, route)
+      def request(method, route, parse: true)
         response = @connection.send(method) do |req|
           url = URI.join(@host, route).to_s
           req.url(url)
           req.headers["Authorization"] = authorisation
         end
 
-        JSON.parse(response.body)
+        parse ? JSON.parse(response.body) : response.body
       end
 
       def authorisation

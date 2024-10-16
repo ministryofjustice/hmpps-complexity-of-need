@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   get "/swagger-ui.html", to: redirect("/api-docs/index.html", status: 302)
   get "/v3/api-docs", to: "swagger_docs#index"
 
-  get "/ping" => "health#index"
+  get "/health/ping" => "health#ping"
   get "/health" => "health#index"
   get "/info" => "info#index"
 
