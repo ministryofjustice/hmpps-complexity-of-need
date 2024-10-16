@@ -39,12 +39,12 @@ generic-service:
 
   livenessProbe:
     httpGet:
-      path: /health
+      path: /health/ping
     periodSeconds: 60
 
   readinessProbe:
     httpGet:
-      path: /health
+      path: /health/ping
     periodSeconds: 60
 
   podSecurityContext:
