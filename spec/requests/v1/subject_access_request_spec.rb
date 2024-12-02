@@ -47,6 +47,7 @@ RSpec.describe "Subject access request", type: :request do
               sourceUser: c.source_user,
               notes: c.notes,
               createdTimeStamp: c.created_at,
+              updatedTimeStamp: c.updated_at,
               active: c.active,
             }
           end,

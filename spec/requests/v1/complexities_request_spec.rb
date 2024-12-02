@@ -33,6 +33,7 @@ RSpec.describe "Complexities", type: :request do
                              level: complexity.level,
                              sourceSystem: complexity.source_system,
                              createdTimeStamp: complexity.created_at,
+                             updatedTimeStamp: complexity.updated_at,
                              active: complexity.active)
       end
     end
@@ -49,6 +50,7 @@ RSpec.describe "Complexities", type: :request do
                              level: complexity.level,
                              sourceSystem: complexity.source_system,
                              createdTimeStamp: complexity.created_at,
+                             updatedTimeStamp: complexity.updated_at,
                              active: complexity.active)
       end
     end
@@ -90,6 +92,7 @@ RSpec.describe "Complexities", type: :request do
             .to eq json_object(level: most_recent.level,
                                offenderNo: offender_no,
                                createdTimeStamp: most_recent.created_at,
+                               updatedTimeStamp: most_recent.updated_at,
                                sourceSystem: most_recent.source_system,
                                active: most_recent.active)
       end
@@ -161,6 +164,7 @@ RSpec.describe "Complexities", type: :request do
                              level: post_body.fetch(:level),
                              sourceSystem: source_system,
                              createdTimeStamp: complexity.created_at,
+                             updatedTimeStamp: complexity.updated_at,
                              active: complexity.active)
       end
     end
@@ -188,6 +192,7 @@ RSpec.describe "Complexities", type: :request do
                              level: post_body.fetch(:level),
                              sourceSystem: source_system,
                              createdTimeStamp: complexity.created_at,
+                             updatedTimeStamp: complexity.updated_at,
                              active: complexity.active)
       end
     end
@@ -317,6 +322,7 @@ RSpec.describe "Complexities", type: :request do
             sourceUser: most_recent.source_user,
             notes: most_recent.notes,
             createdTimeStamp: most_recent.created_at,
+            updatedTimeStamp: most_recent.updated_at,
             active: most_recent.active,
           }.compact # Remove nil values – sourceUser and notes are optional
         end
@@ -353,6 +359,7 @@ RSpec.describe "Complexities", type: :request do
             level: most_recent.level,
             sourceSystem: most_recent.source_system,
             createdTimeStamp: most_recent.created_at,
+            updatedTimeStamp: most_recent.updated_at,
             active: most_recent.active,
           }
         end
@@ -436,6 +443,7 @@ RSpec.describe "Complexities", type: :request do
         expect(response_json.first).to eq json_object(level: complexity.level,
                                                       offenderNo: complexity.offender_no,
                                                       createdTimeStamp: complexity.created_at,
+                                                      updatedTimeStamp: complexity.updated_at,
                                                       sourceSystem: complexity.source_system,
                                                       active: complexity.active)
       end
@@ -466,6 +474,7 @@ RSpec.describe "Complexities", type: :request do
           expect(json).to eq json_object(level: history[index].level,
                                          offenderNo: history[index].offender_no,
                                          createdTimeStamp: history[index].created_at,
+                                         updatedTimeStamp: history[index].updated_at,
                                          sourceSystem: history[index].source_system,
                                          active: history[index].active)
         end
@@ -479,6 +488,7 @@ RSpec.describe "Complexities", type: :request do
             expect(json).to eq json_object(level: history[index].level,
                                            offenderNo: history[index].offender_no,
                                            createdTimeStamp: history[index].created_at,
+                                           updatedTimeStamp: history[index].updated_at,
                                            sourceSystem: history[index].source_system,
                                            active: history[index].active)
           end
@@ -547,6 +557,7 @@ RSpec.describe "Complexities", type: :request do
                              level: complexity.level,
                              sourceSystem: complexity.source_system,
                              createdTimeStamp: complexity.created_at,
+                             updatedTimeStamp: complexity.updated_at,
                              active: complexity.active)
         expect(complexity.active).to be(false)
       end
