@@ -7,16 +7,12 @@ ruby file: ".ruby-version"
 
 gem "rails", "~> 7.1.3"
 
-# these default gems will be removed in ruby 3.4
-gem "drb"
-gem "mutex_m"
-
 gem "aws-sdk-sns"
 gem "faraday"
 gem "jbuilder", "~> 2.7"
 gem "jwt"
 gem "pg", "~> 1.1"
-gem "puma", "~> 6.0"
+gem "puma", "~> 6.5.0"
 gem "responders"
 gem "rswag-api"
 gem "rswag-ui"
