@@ -6,7 +6,6 @@
 
 generic-prometheus-alerts:
   targetApplication: hmpps-complexity-of-need
-  alertSeverity: moic
   hpaTargetOverride: ".*"
   podTargetOverride: ".*"
   deploymentTargetOverride: ".*"
