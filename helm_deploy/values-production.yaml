@@ -1,10 +1,10 @@
 ---
 generic-prometheus-alerts:
+  alertSeverity: mpc-alerts-prod
   rdsAlertsDatabases:
     cloud-platform-caf2be118f45c7ce: production
 
 generic-service:
-  alertSeverity: mpc-alerts-prod
   ingress:
     hosts:
       - complexity-of-need.hmpps.service.justice.gov.uk
