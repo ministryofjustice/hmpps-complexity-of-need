@@ -6,7 +6,7 @@ references:
     working_directory: ~/app
     resource_class: small
     docker:
-      - image: cimg/ruby:3.3.6
+      - image: cimg/ruby:3.4.1
         environment:
           RAILS_ENV: test
           PGHOST: 127.0.0.1
@@ -25,8 +25,8 @@ references:
 version: 2.1
 
 orbs:
-  ruby: circleci/ruby@2.3.1
-  hmpps: ministryofjustice/hmpps@10.1.1
+  ruby: circleci/ruby@2.4.0
+  hmpps: ministryofjustice/hmpps@10.2.0
 
 jobs:
   install_dependencies:
