@@ -25,8 +25,8 @@ references:
 version: 2.1
 
 orbs:
-  ruby: circleci/ruby@2.4.0
-  hmpps: ministryofjustice/hmpps@10.2.0
+  ruby: circleci/ruby@2.5.0
+  hmpps: ministryofjustice/hmpps@10.3.0
 
 jobs:
   install_dependencies:
