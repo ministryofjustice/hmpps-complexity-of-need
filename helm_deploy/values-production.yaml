@@ -10,6 +10,24 @@ generic-service:
       - complexity-of-need.hmpps.service.justice.gov.uk
     tlsSecretName: production-cert
 
+  postgresDatabaseRestore:
+    enabled: true
+    schedule: "15 7 */8 * 1-5"
+    jobName: "db-refresh-job"
+    env:
+      MIGRATIONS_VENDOR: "active_record"
+    namespace_secrets:
+      rds-instance-output:
+        DB_NAME: "database_name"
+        DB_USER: "database_username"
+        DB_PASS: "database_password"
+        DB_HOST: "rds_instance_address"
+      rds-instance-output-preprod:
+        DB_NAME_PREPROD: "database_name"
+        DB_USER_PREPROD: "database_username"
+        DB_PASS_PREPROD: "database_password"
+        DB_HOST_PREPROD: "rds_instance_address"
+
   env:
     SENTRY_CURRENT_ENV: production
     COMPLEXITY_OF_NEED_HOST: https://complexity-of-need.hmpps.service.justice.gov.uk
