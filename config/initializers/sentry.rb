@@ -7,4 +7,8 @@ Sentry.init do |config|
 
   config.breadcrumbs_logger = [:active_support_logger]
   config.release = ENV["BUILD_NUMBER"]
+
+  config.before_send = lambda do |event, hint|
+    hint[:exception].full_message.match?(/ApplicationInsights::TelemetryClient/) ? nil : event
+  end
 end
