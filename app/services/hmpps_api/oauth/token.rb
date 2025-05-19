@@ -55,7 +55,7 @@ module HmppsApi
               k["kid"],
               key.public_key,
             ]
-          end
+          end,
         ]
       end
       # :nocov:
