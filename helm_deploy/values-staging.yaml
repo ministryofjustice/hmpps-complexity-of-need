@@ -10,8 +10,6 @@ generic-service:
       - complexity-of-need-staging.hmpps.service.justice.gov.uk
     tlsSecretName: staging-cert
 
-  allowlist: null
-
   env:
     SENTRY_CURRENT_ENV: staging
     COMPLEXITY_OF_NEED_HOST: https://complexity-of-need-staging.hmpps.service.justice.gov.uk
