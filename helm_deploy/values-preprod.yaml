@@ -10,6 +10,9 @@ generic-service:
       - complexity-of-need-preprod.hmpps.service.justice.gov.uk
     tlsSecretName: preprod-cert
 
+  scheduledDowntime:
+    enabled: true
+
   env:
     SENTRY_CURRENT_ENV: preprod
     COMPLEXITY_OF_NEED_HOST: https://complexity-of-need-preprod.hmpps.service.justice.gov.uk
