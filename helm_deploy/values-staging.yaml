@@ -1,6 +1,7 @@
 ---
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-nonprod-dev
+  businessHoursOnly: true
   rdsAlertsDatabases:
     cloud-platform-030540d10be652c9: staging
 

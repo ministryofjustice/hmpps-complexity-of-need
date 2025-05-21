@@ -1,6 +1,7 @@
 ---
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-nonprod-preprod
+  businessHoursOnly: true
   rdsAlertsDatabases:
     cloud-platform-61b2d7babee32935: preprod
 
