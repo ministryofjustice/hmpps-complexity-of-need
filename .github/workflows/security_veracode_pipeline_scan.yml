@@ -1,0 +1,19 @@
+name: Security veracode pipeline scan
+on:
+  pull_request: # temp, to be removed
+  workflow_dispatch:
+  schedule:
+    - cron: "35 6 * * MON-FRI" # Every weekday
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
+jobs:
+  security-veracode-pipeline-scan:
+    name: Project security veracode pipeline scan
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_pipeline_scan.yml@v2 # WORKFLOW_VERSION
+    with:
+      channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
+    secrets: inherit
