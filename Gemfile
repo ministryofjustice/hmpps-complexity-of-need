@@ -21,6 +21,9 @@ gem "rswag-ui"
 # Microsoft Application Insights
 gem "application_insights"
 
+# Veracode static code analysis
+gem "veracode"
+
 # Sentry error reporting
 gem "sentry-rails"
 gem "sentry-ruby"
