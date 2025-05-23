@@ -11,9 +11,31 @@ permissions:
   security-events: write
 
 jobs:
+  package-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Ruby and install gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Package application
+        run: bundle exec veracode prepare
+      - name: Rename package zip file
+        shell: bash
+        run: mv tmp/veracode*.zip ./source.zip
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: veracode-package-${{ github.sha }}
+          path: source.zip
+          retention-days: 1
+
   security-veracode-pipeline-scan:
     name: Project security veracode pipeline scan
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_pipeline_scan.yml@v2 # WORKFLOW_VERSION
+    needs: package-application
+    uses: ./.github/workflows/test_custom_veracode_scan.yml
     with:
       channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
+      veracode_package_artifact_name: veracode-package-${{ github.sha }}
     secrets: inherit
