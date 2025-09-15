@@ -35,6 +35,7 @@ RUN \
     curl \
     build-essential \
     libpq-dev \
+    libyaml-dev \
     libjemalloc-dev \
   && timedatectl set-timezone Europe/London || true \
   && gem update bundler --no-document \
