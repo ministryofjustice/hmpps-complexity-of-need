@@ -5,7 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby file: ".ruby-version"
 
-gem "rails", "~> 7.1.3"
+gem "rails", "~> 8.0"
 
 gem "aws-sdk-sns"
 gem "faraday"
