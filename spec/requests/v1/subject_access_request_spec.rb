@@ -92,11 +92,31 @@ RSpec.describe "Subject access request", type: :request do
       it_behaves_like "returns an error response"
     end
 
-    context "with no matching complexities" do
+    context "with no dates and no matching complexities" do
       include_context "with mocked token"
 
       let(:get_body) do
         { prn: "bobbins" }
+      end
+
+      it "returns 204" do
+        expect(response).to have_http_status :no_content
+      end
+
+      it "returns blank body" do
+        expect(response.body).to eq ""
+      end
+    end
+
+    context "with dates and no matching complexities" do
+      include_context "with mocked token"
+
+      let(:get_body) do
+        {
+          prn: "bobbins",
+          fromDate: time1.to_date.to_s,
+          toDate: time2.to_date.to_s,
+        }
       end
 
       it "returns 204" do

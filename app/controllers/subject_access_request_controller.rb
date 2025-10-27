@@ -11,12 +11,13 @@ class SubjectAccessRequestController < ApplicationController
     return render_error("CRN parameter not allowed", 3, 209) if params[:crn].present?
     return render_error("Invalid date format", 4, 210) unless parse_dates
 
-    @complexities = Complexity.where(offender_no: params[:prn]).order(created_at: :asc)
-    return not_found if @complexities.none?
+    query = Complexity.where(offender_no: params[:prn])
+    query = query.where(created_at: @from_date.beginning_of_day..@to_date.end_of_day) if @from_date && @to_date
 
-    if @from_date && @to_date
-      @complexities = @complexities.where("DATE(created_at) BETWEEN ? AND ?", @from_date, @to_date)
-    end
+    @complexities = query.order(:created_at)
+    return not_found if @complexities.blank?
+
+    @complexities
   end
 
 private
