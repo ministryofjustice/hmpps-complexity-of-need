@@ -43,8 +43,6 @@ RSpec.describe "Subject access request", type: :request do
             {
               offenderNo: c.offender_no,
               level: c.level,
-              sourceSystem: c.source_system,
-              sourceUser: c.source_user,
               notes: c.notes,
               createdTimeStamp: c.created_at,
               updatedTimeStamp: c.updated_at,
