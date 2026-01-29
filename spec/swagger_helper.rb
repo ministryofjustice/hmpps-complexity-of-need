@@ -117,6 +117,35 @@ RSpec.configure do |config|
             required: %w[offenderNo level createdTimeStamp updatedTimeStamp sourceSystem active],
             additionalProperties: false,
           },
+          SarComplexityOfNeed: {
+            type: :object,
+            properties: {
+              offenderNo: { "$ref" => "#/components/schemas/OffenderNo" },
+              level: { "$ref" => "#/components/schemas/Level" },
+              notes: {
+                type: :string,
+                description: "Free-text notes for this entry",
+              },
+              createdTimeStamp: {
+                type: :string,
+                format: :date_time,
+                description: "The date & time this entry was created (in RFC 3339 format)",
+                example: "2021-03-02T17:18:46.457Z",
+              },
+              updatedTimeStamp: {
+                type: :string,
+                format: :date_time,
+                description: "The date & time this entry was updated (in RFC 3339 format)",
+                example: "2021-03-02T17:18:46.457Z",
+              },
+              active: {
+                type: :boolean,
+                description: "Whether it is active or not",
+              },
+            },
+            required: %w[offenderNo level createdTimeStamp updatedTimeStamp active],
+            additionalProperties: false,
+          },
           NewComplexityOfNeed: {
             type: :object,
             properties: {
@@ -150,7 +179,7 @@ RSpec.configure do |config|
             properties: {
               content: {
                 type: :array,
-                items: { "$ref" => "#/components/schemas/ComplexityOfNeed" },
+                items: { "$ref" => "#/components/schemas/SarComplexityOfNeed" },
               },
             },
           },
