@@ -1,58 +1,62 @@
-FROM ruby:3.4.5-slim-bullseye
+FROM ruby:3.4.5-alpine3.22 AS builder
 
-RUN \
-  set -ex \
-  && apt-get update \
-  && DEBIAN_FRONTEND=noninteractive apt-get install \
-    -y \
-    --no-install-recommends \
-    locales \
-  && sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen \
-  && dpkg-reconfigure --frontend=noninteractive locales \
-  && update-locale LANG=en_GB.UTF-8 \
-  && apt-get clean
+WORKDIR /app
 
-ENV \
-  LANG=en_GB.UTF-8 \
-  LANGUAGE=en_GB.UTF-8 \
-  LC_ALL=en_GB.UTF-8
+# Build-only dependencies required for native gems.
+RUN apk add --no-cache \
+  build-base \
+  postgresql-dev \
+  yaml-dev \
+  git
+
+COPY Gemfile* .ruby-version ./
+
+ENV BUNDLE_WITHOUT="development:test" \
+  BUNDLE_PATH=/app/vendor/bundle
+
+RUN bundle config set deployment 'true' \
+  && bundle install --jobs 4 --retry 3
+
+FROM ruby:3.4.5-alpine AS runtime
+
+ENV LANG=C.UTF-8 \
+  LC_ALL=C.UTF-8 \
+  TZ=Europe/London \
+  BUNDLE_DEPLOYMENT=1 \
+  BUNDLE_WITHOUT=development:test \
+  BUNDLE_PATH=/app/vendor/bundle
+
+WORKDIR /app
+
+# Runtime libraries only.
+RUN apk add --no-cache \
+  ca-certificates \
+  tzdata \
+  postgresql-libs \
+  yaml \
+  jemalloc
+
+RUN addgroup -S appgroup -g 1001 \
+  && adduser -S appuser -u 1001 -G appgroup -h /home/appuser
+
+COPY --from=builder /app/vendor/bundle /app/vendor/bundle
+
+# Install RDS trust bundle for PostgreSQL SSL connections.
+RUN mkdir -p /home/appuser/.postgresql \
+  && wget -qO /home/appuser/.postgresql/root.crt https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+  && chown -R appuser:appgroup /home/appuser
+
+COPY --chown=appuser:appgroup . /app
+
+RUN mkdir -p /app/log /app/tmp \
+  && chown -R appuser:appgroup /app/log /app/tmp
 
 ARG BUILD_NUMBER
 ARG GIT_BRANCH
 ARG GIT_REF
 
-ENV BUILD_NUMBER=${BUILD_NUMBER}
-ENV GIT_BRANCH=${GIT_BRANCH}
-ENV GIT_REF=${GIT_REF}
-
-WORKDIR /app
-
-RUN \
-  set -ex \
-  && apt-get update && apt-get install \
-    -y \
-    --no-install-recommends \
-    curl \
-    build-essential \
-    libpq-dev \
-    libyaml-dev \
-    libjemalloc-dev \
-  && timedatectl set-timezone Europe/London || true \
-  && gem update bundler --no-document \
-  && apt-get clean
-
-RUN mkdir -p /home/appuser/.postgresql && \
-  curl https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
-    > /home/appuser/.postgresql/root.crt
-
-COPY Gemfile* .ruby-version ./
-
-RUN bundle install --without development test --jobs 2 --retry 3
-
-COPY . /app
-
-RUN useradd appuser -u 1001 --user-group --home /home/appuser && \
-  chown -R appuser:appuser /app && \
-  chown -R appuser:appuser /home/appuser
+ENV BUILD_NUMBER=${BUILD_NUMBER} \
+  GIT_BRANCH=${GIT_BRANCH} \
+  GIT_REF=${GIT_REF}
 
 USER 1001
