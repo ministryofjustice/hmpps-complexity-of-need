@@ -1,4 +1,4 @@
-FROM ruby:3.4.5-alpine AS builder
+FROM ruby:3.4.5-alpine3.22 AS builder
 
 WORKDIR /app
 
