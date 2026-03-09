@@ -107,9 +107,6 @@
       "SarComplexityOfNeed": {
         "type": "object",
         "properties": {
-          "offenderNo": {
-            "$ref": "#/components/schemas/OffenderNo"
-          },
           "level": {
             "$ref": "#/components/schemas/Level"
           },
@@ -135,7 +132,6 @@
           }
         },
         "required": [
-          "offenderNo",
           "level",
           "createdTimeStamp",
           "updatedTimeStamp",

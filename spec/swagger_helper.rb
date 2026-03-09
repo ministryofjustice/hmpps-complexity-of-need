@@ -120,7 +120,6 @@ RSpec.configure do |config|
           SarComplexityOfNeed: {
             type: :object,
             properties: {
-              offenderNo: { "$ref" => "#/components/schemas/OffenderNo" },
               level: { "$ref" => "#/components/schemas/Level" },
               notes: {
                 type: :string,
@@ -143,7 +142,7 @@ RSpec.configure do |config|
                 description: "Whether it is active or not",
               },
             },
-            required: %w[offenderNo level createdTimeStamp updatedTimeStamp active],
+            required: %w[level createdTimeStamp updatedTimeStamp active],
             additionalProperties: false,
           },
           NewComplexityOfNeed: {
