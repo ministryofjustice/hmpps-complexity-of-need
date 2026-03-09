@@ -37,7 +37,7 @@ RSpec.describe "Subject access request", type: :request do
     end
 
     shared_examples "returns expected complexities" do
-      it "returns expected complexity records whether active or not" do # rubocop:disable RSpec/ExampleLength
+      it "returns expected complexity records whether active or not" do
         expect(response_json).to eq json_object({
           content: expected_complexities.map do |c|
             {
