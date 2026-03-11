@@ -13,7 +13,7 @@ gem "jbuilder", "~> 2.7"
 gem "jwt"
 gem "ostruct"
 gem "pg"
-gem "puma", "~> 6.6.0"
+gem "puma", "~> 7.2"
 gem "responders"
 gem "rswag-api"
 gem "rswag-ui"
@@ -34,7 +34,7 @@ gem "logstash-event"
 
 group :development, :test do
   gem "brakeman"
-  gem "byebug", platforms: %i[mri mingw x64_mingw]
+  gem "debug"
   gem "dotenv-rails"
   gem "factory_bot_rails"
   gem "rspec-rails"
@@ -53,6 +53,3 @@ group :test do
   gem "simplecov-lcov", require: false
   gem "undercover"
 end
-
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem "tzinfo-data", platforms: %i[mingw mswin x64_mingw jruby]

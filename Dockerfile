@@ -1,4 +1,4 @@
-FROM ruby:3.4.5-alpine3.22 AS builder
+FROM ruby:4.0.1-alpine3.23 AS builder
 
 WORKDIR /app
 
@@ -6,8 +6,7 @@ WORKDIR /app
 RUN apk add --no-cache \
   build-base \
   postgresql-dev \
-  yaml-dev \
-  git
+  yaml-dev
 
 COPY Gemfile* .ruby-version ./
 
@@ -17,7 +16,7 @@ ENV BUNDLE_WITHOUT="development:test" \
 RUN bundle config set deployment 'true' \
   && bundle install --jobs 4 --retry 3
 
-FROM ruby:3.4.5-alpine AS runtime
+FROM ruby:4.0.1-alpine3.23 AS runtime
 
 ENV LANG=C.UTF-8 \
   LC_ALL=C.UTF-8 \
@@ -32,9 +31,7 @@ WORKDIR /app
 RUN apk add --no-cache \
   ca-certificates \
   tzdata \
-  postgresql-libs \
-  yaml \
-  jemalloc
+  postgresql-libs
 
 RUN addgroup -S appgroup -g 1001 \
   && adduser -S appuser -u 1001 -G appgroup -h /home/appuser
