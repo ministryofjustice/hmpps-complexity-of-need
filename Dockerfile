@@ -6,7 +6,8 @@ WORKDIR /app
 RUN apk add --no-cache \
   build-base \
   postgresql-dev \
-  yaml-dev
+  yaml-dev \
+  && apk upgrade --no-cache zlib
 
 COPY Gemfile* .ruby-version ./
 
@@ -31,7 +32,8 @@ WORKDIR /app
 RUN apk add --no-cache \
   ca-certificates \
   tzdata \
-  postgresql-libs
+  postgresql-libs \
+  && apk upgrade --no-cache zlib
 
 RUN addgroup -S appgroup -g 1001 \
   && adduser -S appuser -u 1001 -G appgroup -h /home/appuser
