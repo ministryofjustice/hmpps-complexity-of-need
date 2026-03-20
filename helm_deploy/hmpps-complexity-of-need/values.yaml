@@ -36,15 +36,28 @@ generic-service:
     groups:
       - moj_cloud_platform
 
+  startupProbe:
+    httpGet:
+      path: /health/ping
+      port: http
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 24
+
   livenessProbe:
     httpGet:
       path: /health/ping
-    periodSeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
 
   readinessProbe:
     httpGet:
       path: /health/ping
-    periodSeconds: 60
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
 
   podSecurityContext:
     fsGroup: 1001
