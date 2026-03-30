@@ -12,7 +12,7 @@ jobs:
     env:
       RAILS_ENV: production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/package_veracode_artifact
         with:
           artifact_name: veracode-package-${{ github.sha }}
@@ -24,7 +24,7 @@ jobs:
       security-events: write
     name: Project security veracode policy scan
     needs: package-application
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_policy_scan.yml@v2 # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_policy_scan.yml@95c48db64a6d50acd1f8f8a0f93d1019727e5b4d # v2
     with:
       channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
       veracode_package_artifact_name: veracode-package-${{ github.sha }}
