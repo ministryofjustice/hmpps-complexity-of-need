@@ -31,7 +31,7 @@ jobs:
       matrix:
         environments: ['staging', 'preprod', 'production']
     name: Helm lint
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@95c48db64a6d50acd1f8f8a0f93d1019727e5b4d # v2
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: ${{ matrix.environments }}
@@ -76,7 +76,7 @@ jobs:
   verify_docker_image:
     name: Verify docker image
     if: ${{ ! contains(fromJSON('["refs/heads/main", "refs/heads/staging"]'), github.ref) }}
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@95c48db64a6d50acd1f8f8a0f93d1019727e5b4d # v2
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
@@ -86,7 +86,7 @@ jobs:
   build:
     name: Build docker image
     if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/staging"]'), github.ref) }}
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@95c48db64a6d50acd1f8f8a0f93d1019727e5b4d # v2
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
     needs:
       - helm_lint
       - test
@@ -101,7 +101,7 @@ jobs:
     name: Deploy to staging
     needs:
       - build
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@95c48db64a6d50acd1f8f8a0f93d1019727e5b4d # v2
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: 'staging'
@@ -112,7 +112,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs:
       - build
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@95c48db64a6d50acd1f8f8a0f93d1019727e5b4d # v2
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: 'preprod'
@@ -123,7 +123,7 @@ jobs:
     needs:
       - build
       - deploy_preprod
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@95c48db64a6d50acd1f8f8a0f93d1019727e5b4d # v2
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: 'production'
