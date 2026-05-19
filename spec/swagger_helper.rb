@@ -44,7 +44,7 @@ RSpec.configure do |config|
       # Defaults for all endpoints:
       consumes: ["application/json"], # Only accept JSON payloads
       produces: ["application/json"], # Only return JSON responses
-      security: [HmppsAuth: %w[read]], # Require a valid HMPPS Auth token with "read" scope
+      security: [{ HmppsAuth: %w[read] }], # Require a valid HMPPS Auth token with "read" scope
       components: {
         securitySchemes: {
           Bearer: {

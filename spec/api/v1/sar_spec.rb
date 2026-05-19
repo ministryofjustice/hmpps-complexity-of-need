@@ -17,7 +17,7 @@ describe 'Complexity of Need API', swagger_doc: 'v1/swagger.json' do
 
   path '/subject-access-request' do
     get 'Retrieves all held info for offender' do
-      security [Bearer: []]
+      security [{ Bearer: [] }]
 
       tags 'Subject Access Request'
       description "* NOMIS Prison Number (PRN) must be provided as part of the request.
