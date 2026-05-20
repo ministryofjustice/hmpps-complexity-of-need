@@ -4,7 +4,6 @@ class ApplicationController < ActionController::API
   READ_ROLE = "ROLE_COMPLEXITY_OF_NEED"
   WRITE_ROLE = "ROLE_UPDATE_COMPLEXITY_OF_NEED"
   SAR_ROLE = "ROLE_SAR_DATA_ACCESS"
-  ADMIN_ROLE = "ROLE_CNL_ADMIN"
 
   rescue_from JWT::DecodeError, with: :render_bad_token
 
@@ -26,7 +25,7 @@ private
   def authorise_for!(role)
     if token.nil?
       render_bad_token
-    elsif !token.has_role?(role) && !token.has_role?(ADMIN_ROLE)
+    elsif !token.has_role?(role)
       render_forbidden "You need the role '#{role}' to use this endpoint"
     end
   end

@@ -142,7 +142,7 @@ RSpec.describe "Complexities", type: :request do
     let(:source_system) { Rails.configuration.nomis_oauth_client_id }
 
     before do
-      stub_access_token roles: %w[ROLE_CNL_ADMIN ROLE_UPDATE_COMPLEXITY_OF_NEED]
+      stub_access_token roles: %w[ROLE_UPDATE_COMPLEXITY_OF_NEED]
     end
 
     context "with only mandatory fields" do
@@ -538,7 +538,7 @@ RSpec.describe "Complexities", type: :request do
     let!(:complexity) { create(:complexity) }
 
     before do
-      stub_access_token roles: %w[ROLE_CNL_ADMIN ROLE_UPDATE_COMPLEXITY_OF_NEED]
+      stub_access_token roles: %w[ROLE_UPDATE_COMPLEXITY_OF_NEED]
     end
 
     context "when authenticated with correct role" do

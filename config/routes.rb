@@ -28,4 +28,6 @@ Rails.application.routes.draw do
 
     get "/subject-access-request" => "subject_access_request#show"
   end
+
+  get "/subject-access-request/template" => "subject_access_request#template"
 end
