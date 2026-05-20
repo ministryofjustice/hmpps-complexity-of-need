@@ -256,9 +256,7 @@
           "Single Offender"
         ],
         "description": "Clients calling this endpoint must have role: `ROLE_UPDATE_COMPLEXITY_OF_NEED`",
-        "parameters": [
-
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Complexity of Need level set successfully",
@@ -298,9 +296,7 @@
           "Multiple Offenders"
         ],
         "description": "This endpoint returns a JSON array containing the current Complexity of Need entry for multiple offenders.\n\nThe response array:\n  - will exclude offenders whose Complexity of Need level is not known (i.e. these would result in a `404 Not Found` error on the single `GET` endpoint)\n  - will exclude offenders without a current active level\n  - is not sorted in the same order as the request body\n  - is not paginated\n",
-        "parameters": [
-
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK",
@@ -434,9 +430,7 @@
         "summary": "Retrieves all held info for offender",
         "security": [
           {
-            "Bearer": [
-
-            ]
+            "Bearer": []
           }
         ],
         "tags": [
@@ -587,6 +581,66 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SarOffenderData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subject-access-request/template": {
+      "get": {
+        "summary": "Retrieves the SAR mustache template for this service",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Subject Access Request"
+        ],
+        "description": "* The role ROLE_SAR_DATA_ACCESS is required\n* Returns the plain-text mustache template configured for the service",
+        "responses": {
+          "401": {
+            "description": "Request is not authorised",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error_example": {
+                    "value": {
+                      "developerMessage": "Missing or invalid access token",
+                      "errorCode": 1,
+                      "status": 401,
+                      "userMessage": "Missing or invalid access token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid token role",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error_example": {
+                    "value": {
+                      "developerMessage": "You need the role 'ROLE_SAR_DATA_ACCESS' to use this endpoint",
+                      "errorCode": 5,
+                      "status": 403,
+                      "userMessage": "You need the role 'ROLE_SAR_DATA_ACCESS' to use this endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Template returned",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }

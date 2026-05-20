@@ -14,7 +14,6 @@
 
 ## Auth and request handling
 - Auth is custom JWT handling, not Devise/OAuth middleware. `ApplicationController` parses the bearer token into `HmppsApi::Oauth::Token`, validates signature against cached JWKS from HMPPS Auth, and checks roles manually (`app/controllers/application_controller.rb`, `app/services/hmpps_api/oauth/token.rb`).
-- `ROLE_CNL_ADMIN` bypasses endpoint-specific role checks; preserve that override when changing authorisation.
 - `create` permits camelCase `sourceUser` but persists it as `source_user`, and always sets `source_system` from `token.client_id`, not the request body (`ComplexitiesController#create`).
 
 ## Developer workflows

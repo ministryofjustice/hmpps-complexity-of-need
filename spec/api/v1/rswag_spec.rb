@@ -66,7 +66,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.json" do
       parameter name: :body, in: :body, schema: { "$ref" => "#/components/schemas/NewComplexityOfNeed" }
 
       before do
-        stub_access_token roles: %w[ROLE_CNL_ADMIN ROLE_UPDATE_COMPLEXITY_OF_NEED]
+        stub_access_token roles: %w[ROLE_UPDATE_COMPLEXITY_OF_NEED]
       end
 
       response "200", "Complexity of Need level set successfully" do
@@ -203,7 +203,7 @@ describe "Complexity of Need API", swagger_doc: "v1/swagger.json" do
     let(:offender_no) { "G4273GI" }
 
     before do
-      stub_access_token roles: %w[ROLE_CNL_ADMIN ROLE_UPDATE_COMPLEXITY_OF_NEED]
+      stub_access_token roles: %w[ROLE_UPDATE_COMPLEXITY_OF_NEED]
     end
 
     put "Inactivate the Complexity of Need level for an offender" do

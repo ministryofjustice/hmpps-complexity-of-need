@@ -20,6 +20,10 @@ class SubjectAccessRequestController < ApplicationController
     @complexities
   end
 
+  def template
+    render plain: SubjectAccessRequestTemplateService.content, content_type: "text/plain"
+  end
+
 private
 
   def parse_dates
