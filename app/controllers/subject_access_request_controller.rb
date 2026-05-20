@@ -53,6 +53,8 @@ private
   end
 
   def render_error(msg, error_code, status)
+    Rails.logger.warn("event=subject_access_request_error|status=#{status}|error_code=#{error_code}|message=#{msg}")
+
     render json: {
       developerMessage: msg,
       errorCode: error_code,

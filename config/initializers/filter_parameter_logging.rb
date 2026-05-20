@@ -8,10 +8,6 @@ Rails.application.config.filter_parameters += %i[
   secret
   token
   _key
-  crypt
-  salt
-  certificate
-  otp
-  ssn
   _json
+  notes
 ]

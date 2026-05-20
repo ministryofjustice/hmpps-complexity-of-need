@@ -34,6 +34,9 @@ module HmppsComplexityOfNeed
 
     config.action_dispatch.default_headers["X-Robots-Tag"] = "noindex, nofollow"
 
+    # Sentry environment set with SENTRY_CURRENT_ENV
+    config.sentry_dsn = ENV["SENTRY_DSN"]&.strip
+
     # Always required
     config.nomis_oauth_host = ENV.fetch("NOMIS_OAUTH_HOST")&.strip
 

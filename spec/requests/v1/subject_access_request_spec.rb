@@ -59,8 +59,6 @@ RSpec.describe "Subject access request", type: :request do
     end
 
     context "when passed both a prn and crn as query parameters" do
-      include_context "with mocked token"
-
       let(:get_body) do
         {
           prn: "bobbins",
@@ -68,8 +66,20 @@ RSpec.describe "Subject access request", type: :request do
         }
       end
 
+      before do
+        allow(Rails.logger).to receive(:warn)
+        stub_access_token roles: %w[ROLE_SAR_DATA_ACCESS]
+        get endpoint, headers: request_headers, params: get_body
+      end
+
       it "returns status 400" do
         expect(response).to have_http_status :bad_request
+      end
+
+      it "logs a warning" do
+        expect(Rails.logger).to have_received(:warn).with(
+          "event=subject_access_request_error|status=400|error_code=2|message=Cannot supply both CRN and PRN",
+        )
       end
 
       it_behaves_like "returns an error response"
