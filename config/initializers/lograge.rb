@@ -5,6 +5,7 @@ Rails.application.configure do
   # Reduce noise in the logs by ignoring the healthcheck actions
   config.lograge.ignore_actions = %w[
     HealthController#index
+    HealthController#ping
   ]
 
   config.lograge.custom_options = lambda do |event|
