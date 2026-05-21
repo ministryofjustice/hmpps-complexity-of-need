@@ -3,11 +3,11 @@ FROM ruby:4.0.1-alpine3.23 AS builder
 WORKDIR /app
 
 # Build-only dependencies required for native gems.
-RUN apk add --no-cache \
+RUN apk upgrade --no-cache \
+  && apk add --no-cache \
   build-base \
   postgresql-dev \
-  yaml-dev \
-  && apk upgrade --no-cache zlib
+  yaml-dev
 
 COPY Gemfile* .ruby-version ./
 
@@ -29,11 +29,11 @@ ENV LANG=C.UTF-8 \
 WORKDIR /app
 
 # Runtime libraries only.
-RUN apk add --no-cache \
+RUN apk upgrade --no-cache \
+  && apk add --no-cache \
   ca-certificates \
   tzdata \
-  postgresql-libs \
-  && apk upgrade --no-cache zlib
+  postgresql-libs
 
 RUN addgroup -S appgroup -g 1001 \
   && adduser -S appuser -u 1001 -G appgroup -h /home/appuser
