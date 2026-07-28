@@ -37,7 +37,7 @@ module HmppsApi
 
     private
 
-      # :nocov:
+      # simplecov:disable
       def jwks_hash
         # a combo of https://auth0.com/docs/quickstart/backend/rails/01-authorization?_ga=2.125705866.1258815838.1614860254-689132663.1593072635#configure-auth0-apis
         # and https://gist.github.com/trojkac/a78d5af6c62cc743dad6fbd7e337701b (as we don't have an x5c certificate)
@@ -58,7 +58,7 @@ module HmppsApi
           end,
         ]
       end
-      # :nocov:
+      # simplecov:enable
 
       def jwks_keys
         # Cache calls to this resource – it doesn't change frequently
@@ -73,20 +73,18 @@ module HmppsApi
         end
       end
 
-      # :nocov:
+      # simplecov:disable
       def base64_to_long(data)
         decoded_with_padding = Base64.urlsafe_decode64(data) + Base64.decode64("==")
         decoded_with_padding.to_s.unpack("C*").map { |byte|
           byte_to_hex(byte)
         }.join.to_i(16)
       end
-      # :nocov:
 
-      # :nocov:
       def byte_to_hex(int)
         int < 16 ? "0#{int.to_s(16)}" : int.to_s(16)
       end
-      # :nocov:
+      # simplecov:enable
     end
   end
 end
