@@ -9,7 +9,7 @@ SimpleCov.start :rails do
   enable_coverage :branch
 
   # Ignore ApplicationJob coverage because this app has no jobs
-  add_filter "app/jobs/application_job.rb"
+  skip "app/jobs/application_job.rb"
 
   # Output results in two formats
   # - HTML (required by humans)
