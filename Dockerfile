@@ -1,6 +1,8 @@
-FROM ruby:4.0.6-alpine3.24 AS builder
+FROM ruby:4.0.6-alpine3.24 AS base
 
 WORKDIR /app
+
+FROM base AS builder
 
 # Build-only dependencies required for native gems.
 RUN apk upgrade --no-cache \
@@ -17,7 +19,7 @@ ENV BUNDLE_WITHOUT="development:test" \
 RUN bundle config set deployment 'true' \
   && bundle install --jobs 4 --retry 3
 
-FROM ruby:4.0.1-alpine3.23 AS runtime
+FROM base AS runtime
 
 ENV LANG=C.UTF-8 \
   LC_ALL=C.UTF-8 \
@@ -25,8 +27,6 @@ ENV LANG=C.UTF-8 \
   BUNDLE_DEPLOYMENT=1 \
   BUNDLE_WITHOUT=development:test \
   BUNDLE_PATH=/app/vendor/bundle
-
-WORKDIR /app
 
 # Runtime libraries only.
 RUN apk upgrade --no-cache \
