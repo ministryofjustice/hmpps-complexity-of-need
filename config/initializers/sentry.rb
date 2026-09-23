@@ -9,7 +9,6 @@ if sentry_dsn.present?
   Sentry.init do |config|
     config.dsn = sentry_dsn
     config.release = ENV["BUILD_NUMBER"]
-    config.enable_metrics = false
     config.rails.report_rescued_exceptions = false
 
     if Rails.env.development?

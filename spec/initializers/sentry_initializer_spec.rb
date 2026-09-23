@@ -4,7 +4,7 @@ RSpec.describe Sentry do
   let(:sentry_dsn) { "https://examplePublicKey@o0.ingest.sentry.io/0" }
   let(:rails_config) { instance_double(Sentry::Rails::Configuration) }
   let(:config_class) do
-    Struct.new(:dsn, :release, :enable_metrics, :excluded_exceptions, :before_send, :rails, keyword_init: true)
+    Struct.new(:dsn, :release, :excluded_exceptions, :before_send, :rails, keyword_init: true)
   end
   let(:config) { config_class.new(excluded_exceptions: [], rails: rails_config) }
 
@@ -20,7 +20,6 @@ RSpec.describe Sentry do
     expect(config).to have_attributes(
       dsn: sentry_dsn,
       release: ENV["BUILD_NUMBER"],
-      enable_metrics: false,
     )
   end
 
