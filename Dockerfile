@@ -1,4 +1,4 @@
-FROM ruby:4.0.6-alpine3.24 AS base
+FROM ruby:4.0.7-alpine3.24 AS base
 
 WORKDIR /app
 
