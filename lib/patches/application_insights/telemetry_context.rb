@@ -8,6 +8,7 @@ module Patches
 
         cloud.role_name = "hmpps-complexity-of-need"
         cloud.role_instance = ENV["HOSTNAME"]
+        application.ver = ENV["BUILD_NUMBER"]
       end
     end
   end
