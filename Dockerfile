@@ -1,5 +1,8 @@
 FROM ruby:4.0.7-alpine3.24 AS base
 
+# Increment to refresh OS packages and CA trust in both build stages
+ENV DOCKER_CACHE_BUSTER=2
+
 WORKDIR /app
 
 FROM base AS builder
