@@ -14,7 +14,10 @@ module Patches
     private
 
       def options_hash(request)
-        super.merge(name: request_name(request))
+        super.merge(
+          name: request_name(request),
+          properties: { "requestId" => request.env["action_dispatch.request_id"] }.compact,
+        )
       end
 
       def request_name(request)
