@@ -106,6 +106,7 @@ jobs:
     with:
       environment: 'staging'
       app_version: '${{ needs.build.outputs.app_version }}'
+      helm_timeout: '8m'
 
   deploy_preprod:
     name: Deploy to preprod
@@ -117,15 +118,18 @@ jobs:
     with:
       environment: 'preprod'
       app_version: '${{ needs.build.outputs.app_version }}'
+      helm_timeout: '8m'
 
   deploy_production:
     name: Deploy to production
     needs:
       - build
+      - deploy_staging
       - deploy_preprod
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: 'production'
       app_version: '${{ needs.build.outputs.app_version }}'
+      helm_timeout: '8m'
       slack_notification: 'true'
